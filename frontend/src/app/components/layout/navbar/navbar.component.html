@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+    <button mat-button [routerLink]="getDashboardRoute()">Appointment Platform</button>
+  
+    <span class="spacer"></span>
+  
+    <button mat-button [matMenuTriggerFor]="menu">
+      <mat-icon>account_circle</mat-icon>
+      {{ currentUser?.name }}
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </mat-menu>
+  </mat-toolbar>

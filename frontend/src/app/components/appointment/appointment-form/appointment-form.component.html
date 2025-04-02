@@ -1,0 +1,57 @@
+<h2 mat-dialog-title>New Appointment</h2>
+<mat-dialog-content>
+  <form [formGroup]="appointmentForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Professional</mat-label>
+      <mat-select formControlName="professional">
+        <mat-option *ngFor="let professional of data.professionals" [value]="professional._id">
+          {{professional.name}} ({{professional.profession}})
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="appointmentForm.get('professional')?.hasError('required')">
+        Professional is required  
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="appointmentForm.get('date')?.hasError('required')">
+        Date is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="time-fields">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Start Time</mat-label>
+        <mat-select formControlName="startTime">
+          <mat-option *ngFor="let time of timeSlots" [value]="time">{{time}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="appointmentForm.get('startTime')?.hasError('required')">
+          Start time is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>End Time</mat-label>
+        <mat-select formControlName="endTime">
+          <mat-option *ngFor="let time of timeSlots" [value]="time">{{time}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="appointmentForm.get('endTime')?.hasError('required')">
+          End time is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="appointmentForm.invalid">Save</button>
+</mat-dialog-actions>

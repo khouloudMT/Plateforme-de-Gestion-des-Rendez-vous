@@ -4,12 +4,16 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const setupSwagger = require('./swagger'); 
 
 const app = express();
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:4200',
+    credentials: true
+  }));
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -19,10 +23,18 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/appointments', require('./routes/appointments'));
+// Setup Swagger
+setupSwagger(app); 
+
+// Route files
+const auth = require('./routes/auth');
+const users = require('./routes/users');
+const appointments = require('./routes/appointments');
+
+// Mount routers
+app.use('/api/auth', auth);
+app.use('/api/users', users);
+app.use('/api/appointments', appointments);
 
 
 // Serve static assets if in production

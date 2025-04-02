@@ -1,1 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+//* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { 
+  height: 100%; 
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: 48%;
+  margin-right: 2%;
+}
+
+.time-fields {
+  display: flex;
+  justify-content: space-between;
+}
+
+.login-container, .register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-card, .register-card {
+  width: 400px;
+  padding: 20px;
+}
+
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.error-snackbar {
+  background-color: #f44336;
+  color: white;
+}
+
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+
+.calendar-container {
+  padding: 20px;
+}
+
+.admin-dashboard, .professional-dashboard, .client-dashboard {
+  padding: 20px;
+}
+
+.actions {
+  margin-bottom: 20px;
+}
+
+.user-list-container, .appointments-container {
+  margin-top: 20px;
+}/* You can add global styles to this file, and also import other style files */
