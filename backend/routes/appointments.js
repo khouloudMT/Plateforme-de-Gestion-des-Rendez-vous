@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
-const auth = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const sendEmail = require('../utils/sendEmail');
@@ -10,7 +10,8 @@ const sendEmail = require('../utils/sendEmail');
 // @desc    Create an appointment
 // @access  Private
 router.post('/', [
-    auth,
+    protect,
+    authorize('client'),
     [
         check('professional', 'Professional is required').not().isEmpty(),
         check('date', 'Date is required').not().isEmpty(),
@@ -84,7 +85,10 @@ router.post('/', [
 // @route   GET api/appointments
 // @desc    Get all appointments
 // @access  Private/Admin
-router.get('/', auth, async (req, res) => {
+router.get('/', 
+    protect, 
+    authorize('admin'),
+    async (req, res) => {
     try {
         // Check if user is admin
         if (req.user.role !== 'admin') {
@@ -104,7 +108,10 @@ router.get('/', auth, async (req, res) => {
 // @route   GET api/appointments/me
 // @desc    Get current user's appointments
 // @access  Private
-router.get('/me', auth, async (req, res) => {
+router.get('/me', 
+    protect,
+    authorize('client', 'professional'),
+    async (req, res) => {
     try {
         let appointments;
         
@@ -128,7 +135,16 @@ router.get('/me', auth, async (req, res) => {
 // @route   PUT api/appointments/:id
 // @desc    Update appointment
 // @access  Private
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', 
+    protect, 
+    authorize('client', 'professional'),
+    [
+        check('date', 'Date is required').optional().not().isEmpty(),
+        check('startTime', 'Start time is required').optional().not().isEmpty(),
+        check('endTime', 'End time is required').optional().not().isEmpty(),
+        check('status', 'Status is required').optional().not().isEmpty()
+    ],
+    async (req, res) => {
     const { date, startTime, endTime, status, notes } = req.body;
 
     try {
@@ -205,7 +221,10 @@ router.put('/:id', auth, async (req, res) => {
 // @route   DELETE api/appointments/:id
 // @desc    Delete appointment
 // @access  Private
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', protect,
+    authorize('client', 'professional')
+    
+    , async (req, res) => {
     try {
         const appointment = await Appointment.findById(req.params.id);
 

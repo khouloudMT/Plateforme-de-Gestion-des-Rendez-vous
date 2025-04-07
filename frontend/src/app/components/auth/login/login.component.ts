@@ -41,9 +41,17 @@ export class LoginComponent {
     if (this.loginForm.invalid) {
       return;
     }
-
+  
     this.loading = true;
-    const { email, password } = this.loginForm.value;
-    this.authService.login(email!, password!);
-  }
+    this.authService.login(this.loginForm.value.email!, this.loginForm.value.password!)
+      .subscribe({
+        next: () => {
+          this.loading = false;
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Login error:', error);
+        }
+      });
+}
 }

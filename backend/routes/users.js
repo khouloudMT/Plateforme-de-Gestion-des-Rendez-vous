@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
-const auth = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
 
 // @route   GET api/users
 // @desc    Get all users
 // @access  Private/Admin
-router.get('/', auth, async (req, res) => {
+router.get('/', 
+    protect,
+    authorize('admin'), // Ensure only admin can access this route
+    async (req, res) => {
     try {
         // Check if user is admin
         if (req.user.role !== 'admin') {
@@ -25,7 +28,10 @@ router.get('/', auth, async (req, res) => {
 // @route   GET api/users/professionals
 // @desc    Get all professionals
 // @access  Private
-router.get('/professionals', auth, async (req, res) => {
+router.get('/professionals',
+    protect,
+    authorize('admin','client'), // Ensure only admin can access this route
+     async (req, res) => {
     try {
         const professionals = await User.find({ role: 'professional' }).select('-password');
         res.json(professionals);
@@ -38,7 +44,10 @@ router.get('/professionals', auth, async (req, res) => {
 // @route   GET api/users/:id
 // @desc    Get user by ID
 // @access  Private/Admin
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id',
+    protect,
+    authorize('admin'), // Ensure only admin can access this route
+    async (req, res) => {
     try {
         // Check if user is admin
         if (req.user.role !== 'admin') {
@@ -64,7 +73,10 @@ router.get('/:id', auth, async (req, res) => {
 // @route   PUT api/users/:id
 // @desc    Update user
 // @access  Private/Admin
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id',
+    protect,
+    authorize('admin'), // Ensure only admin can access this route
+    async (req, res) => {
     try {
         // Check if user is admin
         if (req.user.role !== 'admin') {
@@ -96,7 +108,10 @@ router.put('/:id', auth, async (req, res) => {
 // @route   DELETE api/users/:id
 // @desc    Delete user
 // @access  Private/Admin
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id',
+    protect,
+    authorize('admin'), // Ensure only admin can access this route
+    async (req, res) => {
     try {
         // Check if user is admin
         if (req.user.role !== 'admin') {
