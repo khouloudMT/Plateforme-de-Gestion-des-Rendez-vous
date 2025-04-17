@@ -24,23 +24,13 @@
     </mat-form-field>
 
     <div class="time-fields">
-      <mat-form-field appearance="outline" class="half-width">
-        <mat-label>Start Time</mat-label>
-        <mat-select formControlName="startTime">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Time</mat-label>
+        <mat-select formControlName="time">
           <mat-option *ngFor="let time of timeSlots" [value]="time">{{time}}</mat-option>
         </mat-select>
-        <mat-error *ngIf="appointmentForm.get('startTime')?.hasError('required')">
-          Start time is required
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="half-width">
-        <mat-label>End Time</mat-label>
-        <mat-select formControlName="endTime">
-          <mat-option *ngFor="let time of timeSlots" [value]="time">{{time}}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="appointmentForm.get('endTime')?.hasError('required')">
-          End time is required
+        <mat-error *ngIf="appointmentForm.get('time')?.hasError('required')">
+          Time is required
         </mat-error>
       </mat-form-field>
     </div>

@@ -21,9 +21,14 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
   getToken(): string | null {
-    const token = localStorage.getItem('token');
-    console.log('Retrieved token:', token); // Add this line
-    return token;
+    if (typeof window !== 'undefined' && localStorage) {
+      const token = localStorage.getItem('token');
+      console.log('Retrieved token:', token);
+      return token;
+    } else {
+      console.warn('localStorage is not available in this environment');
+      return null;
+    }
   }
 
   login(email: string, password: string) {

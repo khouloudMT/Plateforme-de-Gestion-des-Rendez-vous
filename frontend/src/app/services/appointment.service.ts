@@ -8,7 +8,7 @@ export class AppointmentService {
 
   constructor(private http: HttpClient) { }
   getClientAppointments() {
-    return this.http.get<any[]>('http://localhost:5000/api/appointments/me');
+    return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
   }
 
   getProfessionalAppointments() {

@@ -10,6 +10,7 @@ import { UserService } from '../../../services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AppointmentFormComponent } from '../../appointment/appointment-form/appointment-form.component';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
+import { AppointmentListComponent } from "../../appointment/appointment-list/appointment-list.component";
 
 @Component({
   selector: 'app-client-dashboard',
@@ -18,7 +19,10 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
     MatTableModule,
     MatIconModule,
     MatButtonModule,
-    MatChipsModule,RouterModule,RouterOutlet
+    MatChipsModule,
+    RouterModule,
+    RouterOutlet,
+    AppointmentListComponent,
   ],
   templateUrl: './client-dashboard.component.html',
   styleUrl: './client-dashboard.component.scss'
@@ -27,7 +31,7 @@ export class ClientDashboardComponent {
   appointments: any[] = [];
   professionals: any[] = [];
   displayedColumns: string[] = ['professional', 'date', 'time', 'status', 'actions'];
-
+  
   constructor(
     private appointmentService: AppointmentService,
     private userService: UserService,

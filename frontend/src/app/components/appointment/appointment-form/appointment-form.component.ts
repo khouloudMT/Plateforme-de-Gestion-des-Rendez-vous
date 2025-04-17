@@ -7,7 +7,8 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import moment from 'moment';
+import { AppointmentService } from '../../../services/appointment.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-appointment-form',
@@ -30,13 +31,13 @@ export class AppointmentFormComponent {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AppointmentFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private appointmentService: AppointmentService
   ) {
     this.appointmentForm = this.fb.group({
       professional: ['', Validators.required],
       date: ['', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
+      time: ['', Validators.required],
       notes: ['']
     });
   }
@@ -54,22 +55,20 @@ export class AppointmentFormComponent {
   }
 
   onSubmit() {
-    if (this.appointmentForm.invalid) {
-      return;
-    }
+    const appointmentData = this.appointmentForm.value;
 
-    const formValue = this.appointmentForm.value;
-    const appointmentData = {
-      professional: formValue.professional,
-      date: moment(formValue.date).format('YYYY-MM-DD'),
-      startTime: formValue.startTime,
-      endTime: formValue.endTime,
-      notes: formValue.notes
-    };
-
-    this.dialogRef.close(appointmentData);
+    this.appointmentService.createAppointment(appointmentData).subscribe({
+      next: res => {
+        console.log("Rendez-vous enregistré", res);
+        this.dialogRef.close(true);
+      },
+      error: err => {
+        if (err.status === 400) {
+          alert(err.error.msg); 
+        } else {
+          console.error("Erreur :", err);
+        }
+      }
+    });
   }
-
 }
-
-

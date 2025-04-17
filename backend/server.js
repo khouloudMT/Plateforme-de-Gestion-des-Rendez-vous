@@ -16,12 +16,15 @@ app.use(cors({
   }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/rendezvous', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
+
+// Debugging: Verify routes are loading
+console.log('Before requiring routes');
 
 // Setup Swagger
 setupSwagger(app); 
@@ -31,10 +34,15 @@ const auth = require('./routes/auth');
 const users = require('./routes/users');
 const appointments = require('./routes/appointments');
 
+// Debugging: Verify routes loaded
+console.log('Routes required:', { auth, users, appointments });
+
 // Mount routers
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 app.use('/api/appointments', appointments);
+
+
 
 
 // Serve static assets if in production

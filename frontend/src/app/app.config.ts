@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideNativeDateAdapter(),
     importProvidersFrom(
       MatSnackBarModule,
-      MatDialogModule
+      MatDialogModule,
     )
   ]
 };

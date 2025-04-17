@@ -1,0 +1,105 @@
+.dashboard-container {
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+  
+    .stats-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+  
+      .stat-box {
+        flex: 1;
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  
+        strong {
+          font-size: 1.5rem;
+          display: block;
+        }
+  
+        &.active {
+          background-color: #3f51b5;
+          color: white;
+        }
+      }
+    }
+  
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+  
+      input, select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+  
+      .filter-btn {
+        background-color: #3f51b5;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    }
+  
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      th, td {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+      }
+      th {
+        background: #f9fafb;
+      }
+  
+      mat-chip {
+        border-radius: 16px;
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+      
+  
+      .edit-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+    }
+  
+    .professional-carousel {
+      margin-top: 40px;
+  
+      h3 {
+        margin-bottom: 10px;
+      }
+  
+      .avatars {
+        display: flex;
+        gap: 20px;
+  
+        .avatar-card {
+          text-align: center;
+          img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+        }
+      }
+    }
+  }
+  

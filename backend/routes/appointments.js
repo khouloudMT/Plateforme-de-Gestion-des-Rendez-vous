@@ -15,8 +15,7 @@ router.post('/', [
     [
         check('professional', 'Professional is required').not().isEmpty(),
         check('date', 'Date is required').not().isEmpty(),
-        check('startTime', 'Start time is required').not().isEmpty(),
-        check('endTime', 'End time is required').not().isEmpty()
+        check('time', 'Time is required').not().isEmpty(),
     ]
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -24,7 +23,7 @@ router.post('/', [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { professional, date, startTime, endTime, notes } = req.body;
+    const { professional, date, time, notes } = req.body;
 
     try {
         // Check if professional exists
@@ -35,26 +34,20 @@ router.post('/', [
 
         // Check for time conflicts
         const existingAppointment = await Appointment.findOne({
-            professional,
-            date,
-            $or: [
-                {
-                    startTime: { $lt: endTime },
-                    endTime: { $gt: startTime }
-                }
-            ]
-        });
-
-        if (existingAppointment) {
-            return res.status(400).json({ msg: 'Time slot already booked' });
-        }
+            client: req.user.id,
+            professional: req.body.professional,
+            date: req.body.date
+          });
+          
+          if (existingAppointment) {
+            return res.status(400).json({ msg: 'You already have an appointment with this professional on this date.' });
+          }
 
         const appointment = new Appointment({
             client: req.user.id,
             professional,
             date,
-            startTime,
-            endTime,
+            time,
             notes
         });
 
@@ -70,7 +63,7 @@ router.post('/', [
         const emailData = {
             to: client.email,
             subject: 'Appointment Confirmation',
-            text: `Your appointment with ${savedAppointment.professional.name} on ${date} from ${startTime} to ${endTime} has been booked.`
+            text: `Your appointment with ${savedAppointment.professional.name} on ${date} at ${time} has been booked.`
         };
 
         await sendEmail(emailData);
@@ -78,7 +71,7 @@ router.post('/', [
         res.json(appointment);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(500).json({ message: "Server Error" });
     }
 });
 
@@ -108,7 +101,7 @@ router.get('/',
 // @route   GET api/appointments/me
 // @desc    Get current user's appointments
 // @access  Private
-router.get('/me', 
+router.get('/my-appointments', 
     protect,
     authorize('client', 'professional'),
     async (req, res) => {
@@ -117,10 +110,12 @@ router.get('/me',
         
         if (req.user.role === 'client') {
             appointments = await Appointment.find({ client: req.user.id })
-                .populate('professional', 'name email profession');
+                .populate('professional', 'name email profession')
+                .sort({ date: 1 });
         } else if (req.user.role === 'professional') {
             appointments = await Appointment.find({ professional: req.user.id })
-                .populate('client', 'name email');
+                .populate('client', 'name email')
+                .sort({ date: 1 });
         } else {
             return res.status(401).json({ msg: 'Not authorized' });
         }
@@ -140,12 +135,11 @@ router.put('/:id',
     authorize('client', 'professional'),
     [
         check('date', 'Date is required').optional().not().isEmpty(),
-        check('startTime', 'Start time is required').optional().not().isEmpty(),
-        check('endTime', 'End time is required').optional().not().isEmpty(),
+        check('time', 'Time is required').optional().not().isEmpty(),
         check('status', 'Status is required').optional().not().isEmpty()
     ],
     async (req, res) => {
-    const { date, startTime, endTime, status, notes } = req.body;
+    const { date, time, status, notes } = req.body;
 
     try {
         let appointment = await Appointment.findById(req.params.id);
@@ -165,19 +159,16 @@ router.put('/:id',
         }
 
         // Check for time conflicts if time is being updated
-        if (date || startTime || endTime) {
+        if (date || time) {
             const checkDate = date || appointment.date;
-            const checkStartTime = startTime || appointment.startTime;
-            const checkEndTime = endTime || appointment.endTime;
-
+            const checkTime = time || appointment.time;
             const existingAppointment = await Appointment.findOne({
                 professional: appointment.professional,
                 date: checkDate,
                 _id: { $ne: appointment._id },
                 $or: [
                     {
-                        startTime: { $lt: checkEndTime },
-                        endTime: { $gt: checkStartTime }
+                        time: { $lt: checkTime }
                     }
                 ]
             });
@@ -188,8 +179,7 @@ router.put('/:id',
         }
 
         appointment.date = date || appointment.date;
-        appointment.startTime = startTime || appointment.startTime;
-        appointment.endTime = endTime || appointment.endTime;
+        appointment.time = time || appointment.time;
         appointment.status = status || appointment.status;
         appointment.notes = notes || appointment.notes;
 
@@ -203,7 +193,7 @@ router.put('/:id',
         const emailData = {
             to: populatedAppointment.client.email,
             subject: 'Appointment Updated',
-            text: `Your appointment with ${populatedAppointment.professional.name} has been updated. New details: ${appointment.date} from ${appointment.startTime} to ${appointment.endTime}. Status: ${appointment.status}`
+            text: `Your appointment with ${populatedAppointment.professional.name} has been updated. New details: ${appointment.date} at ${appointment.time}. Status: ${appointment.status}`
         };
 
         await sendEmail(emailData);
@@ -226,16 +216,16 @@ router.delete('/:id', protect,
     
     , async (req, res) => {
     try {
-        const appointment = await Appointment.findById(req.params.id);
+        const appointment = await Appointment.findById(req.params.id)
+        .populate('client', 'name email')
+        .populate('professional', 'name email');
 
-        if (!appointment) {
-            return res.status(404).json({ msg: 'Appointment not found' });
-        }
+        if (!appointment) return res.status(404).json({ msg: 'Appointment not found' });
 
-        // Check if user is client or professional associated with the appointment
-        if (req.user.id !== appointment.client.toString() && req.user.id !== appointment.professional.toString()) {
-            return res.status(401).json({ msg: 'Not authorized' });
-        }
+        if (req.user.id !== appointment.client._id.toString() &&
+            req.user.id !== appointment.professional._id.toString()) {
+        return res.status(401).json({ msg: 'Not authorized' });
+}
 
         // Send cancellation email
         const populatedAppointment = await Appointment.findById(appointment._id)
@@ -248,7 +238,7 @@ router.delete('/:id', protect,
             text: `Your appointment with ${populatedAppointment.professional.name} on ${appointment.date} has been cancelled.`
         };
 
-        await appointment.remove();
+        await await Appointment.findByIdAndDelete(req.params.id);
         await sendEmail(emailData);
 
         res.json({ msg: 'Appointment removed' });
@@ -257,7 +247,7 @@ router.delete('/:id', protect,
         if (err.kind === 'ObjectId') {
             return res.status(404).json({ msg: 'Appointment not found' });
         }
-        res.status(500).send('Server Error');
+        res.status(500).json({ message: "Server Error" });
     }
 });
 
