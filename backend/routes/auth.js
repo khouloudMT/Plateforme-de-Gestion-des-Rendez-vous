@@ -13,14 +13,25 @@ router.post('/register', [
     check('name', 'Name is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    check('role', 'Role is required').not().isEmpty()
+    check('role', 'Role is required').not().isEmpty(),
+    check('profession', 'Profession is required').custom((value, { req }) => {
+        if (req.body.role === 'professional' && !value) {
+            throw new Error('Profession is required for professionals');
+        }
+        return true;
+    }),
+    check('phone', 'Phone number is required').not().isEmpty(),
+    check('gender', 'Gender is required').not().isEmpty(),  
+
+
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, role, profession } = req.body;
+    const { name, email, password, role, profession, phone, gender } = req.body;
+
 
     try {
         let user = await User.findOne({ email });
@@ -34,6 +45,8 @@ router.post('/register', [
             email,
             password,
             role,
+            phone,
+            gender,
             profession: role === 'professional' ? profession : undefined
         });
 

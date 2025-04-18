@@ -1,0 +1,33 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}

@@ -33,14 +33,16 @@ setupSwagger(app);
 const auth = require('./routes/auth');
 const users = require('./routes/users');
 const appointments = require('./routes/appointments');
+const professionals = require('./routes/professionals'); 
 
 // Debugging: Verify routes loaded
-console.log('Routes required:', { auth, users, appointments });
+console.log('Routes required:', { auth, users, appointments, professionals });
 
 // Mount routers
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 app.use('/api/appointments', appointments);
+app.use('/api/professionals', professionals);
 
 
 

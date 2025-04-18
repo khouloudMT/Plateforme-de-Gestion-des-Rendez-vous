@@ -1,4 +1,4 @@
-import { Component, Input, NgModule, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AppointmentService } from '../../../services/appointment.service';
 import { UserService } from '../../../services/user.service';
 import { FormsModule } from '@angular/forms';
@@ -69,19 +69,18 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
+  // Pagination logic
   updatePagedAppointments() {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
     this.pagedAppointments = this.appointments.slice(start, end);
   }
-  
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePagedAppointments();
     }
   }
-  
   previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;

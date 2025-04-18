@@ -9,28 +9,30 @@
 
     <nav>
       <ul class="nav-menu">
-        <li class="nav-item active">
-          <a routerLink="/appointments" routerLinkActive="active">
+        <li class="nav-item">
+          <a routerLink="/client/appointments" routerLinkActive="active">
             <mat-icon>event</mat-icon>
             My Appointments
           </a>
         </li>
         <li class="nav-item">
-          <a routerLink="/calendar" routerLinkActive="active">
+          <a routerLink="/client/calendar" routerLinkActive="active">
             <mat-icon>calendar_today</mat-icon>
             Calendar
           </a>
         </li>
         <li class="nav-item">
-          <a routerLink="/professionals" routerLinkActive="active">
+          <a routerLink="/client/professionals" routerLinkActive="active">
             <mat-icon>people</mat-icon>
             Professionals
           </a>
         </li>
+        
       </ul>
     </nav>
 
   </div>
+  
 
   <!-- Main Content Area -->
   <div class="main-content">
@@ -39,13 +41,6 @@
         <button mat-raised-button color="primary" (click)="openAppointmentForm()">
           <mat-icon>add</mat-icon> New Appointment
         </button>
-      </div>
-      
-      <div class="appointments-container">
-        <h2>Your Appointments</h2>
-        
-        <app-appointment-list [appointments]="appointments"
-        [professionals]="professionals"></app-appointment-list>
       </div>
     
       <router-outlet></router-outlet>

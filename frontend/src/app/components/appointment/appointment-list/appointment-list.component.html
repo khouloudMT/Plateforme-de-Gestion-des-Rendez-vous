@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+<div class="appointment-container">
   <!-- Top Stats -->
   <div class="stats-bar">
     <div class="stat-box"> <strong>5</strong> <span>Today</span> </div>
@@ -58,20 +58,17 @@
     </table>
   </div>
   <!-- Pagination controls -->
-<div class="pagination">
-  <button (click)="previousPage()" [disabled]="currentPage === 1">Prev</button>
-  <span>Page {{ currentPage }} of {{ totalPages }}</span>
-  <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+ <!-- Pagination -->
+ <div class="pagination-controls">
+  <button mat-stroked-button color="primary" (click)="previousPage()" [disabled]="currentPage === 1">
+    <mat-icon>chevron_left</mat-icon>
+    Previous
+  </button>
+  <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
+  <button mat-stroked-button color="primary" (click)="nextPage()" [disabled]="currentPage === totalPages">
+    Next
+    <mat-icon>chevron_right</mat-icon>
+  </button>
 </div>
-  <!-- Professional Suggestions
-  <div class="professional-carousel">
-    <h3>Professional (random show)</h3>
-    <div class="avatars">
-      <div class="avatar-card" *ngFor="let pro of randomProfessionals">
-        <img [src]="pro.avatarUrl" alt="avatar" />
-        <div>{{pro.name}}</div>
-        <small>{{pro.profession}}</small>
-      </div>
-    </div>
-  </div> -->
+
 </div>

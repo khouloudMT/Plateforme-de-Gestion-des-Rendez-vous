@@ -1,0 +1,34 @@
+<div class="profession-filters">
+  <button (click)="selectProfession('')" [ngClass]="{ selected: selectedProfession === '' }">All</button>
+  <button
+    *ngFor="let prof of professions"
+    (click)="selectProfession(prof)"
+    [ngClass]="{ selected: selectedProfession === prof }"
+  >
+    {{ prof }}
+  </button>
+  
+</div>
+
+
+<div class="grid-container">
+  <div class="card" *ngFor="let prof of pagedProfessionals">
+    <img
+      class="profile-image"
+      [src]="getProfileImage(prof.gender)"
+      alt="Professional photo"
+    />
+
+    <div class="info">
+      <h3>{{ prof.name }}</h3>
+      <p class="profession">{{ prof.profession }}</p>
+      <p class="phone">{{ prof.phone }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="pagination-controls">
+  <button (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+  <span>Page {{ currentPage }} / {{ totalPages }}</span>
+  <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+</div>

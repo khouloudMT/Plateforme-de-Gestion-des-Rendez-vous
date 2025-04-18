@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,9 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
+    MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -32,6 +35,7 @@ export class LoginComponent {
     password: ['', Validators.required]
   });
   loading = false;
+  hidePassword = true;
 
   constructor(
     private authService: AuthService

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -31,14 +31,18 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-    fb: FormBuilder = inject(FormBuilder);
-    registerForm = this.fb.group({
+  fb: FormBuilder = inject(FormBuilder);
+
+  registerForm = this.fb.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
+    phone: ['', Validators.required],
+    gender: ['', Validators.required],
     role: ['client', Validators.required],
     profession: ['']
   });
+
   loading = false;
   hidePassword = true;
 
@@ -58,9 +62,7 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    if (this.registerForm.invalid) {
-      return;
-    }
+    if (this.registerForm.invalid) return;
 
     this.loading = true;
     this.authService.register(this.registerForm.value)

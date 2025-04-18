@@ -9,6 +9,8 @@ import { ProfessionalDashboardComponent } from './components/professional/profes
 import { ClientDashboardComponent } from './components/client/client-dashboard/client-dashboard.component';
 import { CalendarViewComponent } from './components/calendar/calendar-view/calendar-view.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ProfessionalListComponent } from './components/professional/professional-list/professional-list.component';
+import { AppointmentListComponent } from './components/appointment/appointment-list/appointment-list.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -33,13 +35,16 @@ export const routes: Routes = [
             canActivate: [roleGuard],
             data: { role: 'professional' }
           },
+          // **** Client ROUTES ****
           { 
             path: 'client', 
             component: ClientDashboardComponent,
             canActivate: [roleGuard],
             data: { role: 'client' },
             children: [
-              { path: 'calendar', component: CalendarViewComponent }
+              { path: 'appointments', component: AppointmentListComponent },
+              { path: 'calendar', component: CalendarViewComponent },
+              { path: 'professionals', component: ProfessionalListComponent },
             ]
           },
           { path: '', redirectTo: 'client', pathMatch: 'full' }

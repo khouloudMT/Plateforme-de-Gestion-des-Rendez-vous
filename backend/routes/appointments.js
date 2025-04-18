@@ -32,7 +32,8 @@ router.post('/', [
             return res.status(400).json({ msg: 'Professional not found' });
         }
 
-        // Check for time conflicts
+        // client cant make more than one appointment with the same professional
+        // chack if the appointment exists
         const existingAppointment = await Appointment.findOne({
             client: req.user.id,
             professional: req.body.professional,
@@ -42,7 +43,7 @@ router.post('/', [
           if (existingAppointment) {
             return res.status(400).json({ msg: 'You already have an appointment with this professional on this date.' });
           }
-
+        // create appointment
         const appointment = new Appointment({
             client: req.user.id,
             professional,
@@ -250,5 +251,8 @@ router.delete('/:id', protect,
         res.status(500).json({ message: "Server Error" });
     }
 });
+
+
+
 
 module.exports = router;

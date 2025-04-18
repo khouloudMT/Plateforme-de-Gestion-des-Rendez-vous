@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterModule, RouterOutlet } from '@angular/router';
 import { AppointmentService } from '../../../services/appointment.service';
 import { UserService } from '../../../services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AppointmentFormComponent } from '../../appointment/appointment-form/appointment-form.component';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
-import { AppointmentListComponent } from "../../appointment/appointment-list/appointment-list.component";
+
+
 
 @Component({
   selector: 'app-client-dashboard',
@@ -22,8 +23,8 @@ import { AppointmentListComponent } from "../../appointment/appointment-list/app
     MatChipsModule,
     RouterModule,
     RouterOutlet,
-    AppointmentListComponent,
-  ],
+    RouterLink
+],
   templateUrl: './client-dashboard.component.html',
   styleUrl: './client-dashboard.component.scss'
 })
