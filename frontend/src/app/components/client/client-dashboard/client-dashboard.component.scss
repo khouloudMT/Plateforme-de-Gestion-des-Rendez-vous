@@ -2,6 +2,7 @@
     display: flex;
     min-height: 100vh;
     font-family: Poppins, sans-serif;
+    
   
     .side-nav {
       width: 250px;
@@ -60,9 +61,6 @@
         border-radius: 5px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   
-        .actions {
-          margin-bottom: 20px;
-        }
   
         .appointments-container {
           h2 {

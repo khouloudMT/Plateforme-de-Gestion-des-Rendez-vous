@@ -1,0 +1,41 @@
+.reschedule-container {
+    padding: 24px;
+    max-width: 400px;
+  
+    .header {
+      margin-bottom: 16px;
+  
+      h2 {
+        margin: 0 0 4px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+  
+      p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+      }
+    }
+  
+    form {
+      display: flex;
+      flex-direction: column;
+  
+      .full-width {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+  
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+  
+        button {
+          min-width: 100px;
+        }
+      }
+    }
+  }
+  

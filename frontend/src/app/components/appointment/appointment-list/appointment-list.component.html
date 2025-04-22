@@ -1,11 +1,15 @@
 <div class="appointment-container">
-  <!-- Top Stats -->
-  <div class="stats-bar">
-    <div class="stat-box"> <strong>5</strong> <span>Today</span> </div>
-    <div class="stat-box active"> <strong>10</strong> <span>Weekly</span> </div>
-    <div class="stat-box"> <strong>15</strong> <span>Upcoming</span> </div>
-    <div class="stat-box"> <strong>5</strong> <span>Recent Added</span> </div>
-    <div class="stat-box"> <strong>15</strong> <span>Pending</span> </div>
+
+  <!-- Stats BAr-->
+  <app-appointment-stats [appointments]="appointments"></app-appointment-stats>
+
+
+
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="openAppointmentForm()">
+      <mat-icon>add</mat-icon> New Appointment
+    </button>
   </div>
 
   <!-- Filters -->
@@ -19,8 +23,10 @@
       <option value="pending">Pending</option>
       <option value="completed">Completed</option>
     </select>
-    <button class="filter-btn" (click)="applyFilters()">Filter</button>
+    <button class="filter-btn" (click)="applyFilters()"><mat-icon>filter_alt</mat-icon></button>
+
   </div>
+
 
   <!-- Appointment Table -->
   <div class="appointments-table">
@@ -28,6 +34,7 @@
       <thead>
         <tr>
           <th>Date</th>
+          <th>Time</th>
           <th>Professional</th>
           <th>Profession</th>
           <th>Status</th>
@@ -38,6 +45,7 @@
       <tbody>
         <tr *ngFor="let appt of appointments">
           <td>{{appt.date | date:'mediumDate'}}</td>
+          <td>{{appt.time}}</td>
           <td>{{appt.professional.name}}</td>
           <td>{{appt.professional.profession}}</td>
           
@@ -48,7 +56,9 @@
           </td>
          
           <td>
-            <button class="edit-btn" (click)="editAppointment(appt)"><mat-icon>edit</mat-icon></button>
+            <button class="edit-btn" (click)="editAppointment(appt)">
+              <mat-icon>edit</mat-icon>
+            </button>
           </td>
           <td>
             <button class="delete-btn" (click)="deleteAppointment(appt)"><mat-icon>delete</mat-icon></button>
@@ -57,18 +67,5 @@
       </tbody>
     </table>
   </div>
-  <!-- Pagination controls -->
- <!-- Pagination -->
- <div class="pagination-controls">
-  <button mat-stroked-button color="primary" (click)="previousPage()" [disabled]="currentPage === 1">
-    <mat-icon>chevron_left</mat-icon>
-    Previous
-  </button>
-  <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
-  <button mat-stroked-button color="primary" (click)="nextPage()" [disabled]="currentPage === totalPages">
-    Next
-    <mat-icon>chevron_right</mat-icon>
-  </button>
-</div>
 
 </div>

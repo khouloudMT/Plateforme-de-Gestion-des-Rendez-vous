@@ -8,7 +8,6 @@ import { RouterLink, RouterModule, RouterOutlet } from '@angular/router';
 import { AppointmentService } from '../../../services/appointment.service';
 import { UserService } from '../../../services/user.service';
 import { MatDialog } from '@angular/material/dialog';
-import { AppointmentFormComponent } from '../../appointment/appointment-form/appointment-form.component';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
 
@@ -39,7 +38,6 @@ export class ClientDashboardComponent {
     private dialog: MatDialog
   ) {
     this.loadAppointments();
-    this.loadProfessionals();
   }
 
   loadAppointments() {
@@ -47,25 +45,7 @@ export class ClientDashboardComponent {
       this.appointments = appointments;
     });
   }
-
-  loadProfessionals() {
-    this.userService.getProfessionals().subscribe(professionals => {
-      this.professionals = professionals;
-    });
-  }
-
-  openAppointmentForm() {
-    const dialogRef = this.dialog.open(AppointmentFormComponent, {
-      width: '600px',
-      data: { professionals: this.professionals }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadAppointments();
-      }
-    });
-  }
+  
 
   cancelAppointment(appointmentId: string) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -82,13 +62,5 @@ export class ClientDashboardComponent {
     });
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'confirmed': return 'primary';
-      case 'pending': return 'accent';
-      case 'cancelled': return 'warn';
-      default: return '';
-    }
-  }
 
 }

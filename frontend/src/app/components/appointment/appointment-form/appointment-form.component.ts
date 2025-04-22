@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AppointmentService } from '../../../services/appointment.service';
-import { UserService } from '../../../services/user.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-appointment-form',
@@ -20,7 +20,9 @@ import { UserService } from '../../../services/user.service';
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSelectModule,
+    MatSnackBarModule //toast notification
   ],
   templateUrl: './appointment-form.component.html',
   styleUrl: './appointment-form.component.scss'
@@ -32,7 +34,8 @@ export class AppointmentFormComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AppointmentFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private snackBar: MatSnackBar
   ) {
     this.appointmentForm = this.fb.group({
       professional: ['', Validators.required],
@@ -59,15 +62,18 @@ export class AppointmentFormComponent {
 
     this.appointmentService.createAppointment(appointmentData).subscribe({
       next: res => {
-        console.log("Rendez-vous enregistré", res);
+        this.snackBar.open('Appointment added successfully!', 'Close', {        
+        duration: 3000,
+          panelClass: ['success-snackbar']
+        });
         this.dialogRef.close(true);
       },
-      error: err => {
-        if (err.status === 400) {
-          alert(err.error.msg); 
-        } else {
-          console.error("Erreur :", err);
-        }
+      error: (err) => {
+        this.snackBar.open('Failed to add an appointment.', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        console.error("Update failed", err);
       }
     });
   }

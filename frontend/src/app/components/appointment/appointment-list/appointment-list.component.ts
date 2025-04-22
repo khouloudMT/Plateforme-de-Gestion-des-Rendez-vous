@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AppointmentService } from '../../../services/appointment.service';
-import { UserService } from '../../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -9,7 +8,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component'; // ajuste le chemin si besoin
-
+import { RescheduleAppointmentComponent } from '../reschedule-appointment/reschedule-appointment.component';
+import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
+import { UserService } from '../../../services/user.service';
+import { AppointmentStatsComponent } from '../appointment-stats/appointment-stats.component';
 
 @Component({
   selector: 'app-appointment-list',
@@ -21,7 +23,9 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
+    AppointmentStatsComponent
   ],
+
   styleUrls: ['./appointment-list.component.scss']
 })
 
@@ -34,34 +38,33 @@ export class AppointmentListComponent implements OnInit {
   selectedStatus: string = '';
   @Input() appointments: any[] = [];
   @Input() professionals: any[] = [];
-  randomProfessionals: any[] = [];
 
-  pagedAppointments: any[] = [];
-  pageSize: number = 5;
-  currentPage: number = 1;
-  totalPages: number = 1;
+  currentPage: number = 0;
+  pageSize: number = 7; // Nombre d'éléments par page
+  totalItems = this.appointments.length;
+  pagedAppointments: any[] = []; // Liste paginée des rendez-vous
+  
 
   constructor(
     private appointmentService: AppointmentService,
+    private dialog: MatDialog,
     private userService: UserService,
-    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.loadAppointments();
+    this.loadProfessionals();
     // this.loadRandomProfessionals();
   }
+
+  
+
 
   loadAppointments() {
     this.appointmentService.getClientAppointments().subscribe({
       next: (res: any[]) => {
         this.appointments = res;
-        this.allAppointments = res;
   
-        // Ajoute ces lignes pour gérer la pagination
-        this.totalPages = Math.ceil(this.appointments.length / this.pageSize);
-        this.currentPage = 1;
-        this.updatePagedAppointments();
       },
       error: err => {
         console.error("Erreur chargement appointments", err);
@@ -69,26 +72,28 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
-  // Pagination logic
-  updatePagedAppointments() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedAppointments = this.appointments.slice(start, end);
-  }
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagedAppointments();
-    }
-  }
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagedAppointments();
-    }
-  }
-  
+  // Appointment form logic
+  openAppointmentForm() {
+    const dialogRef = this.dialog.open(AppointmentFormComponent, {
+      width: '600px',
+      data: { professionals: this.professionals }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadAppointments();
+      }
+    });
+  }
+  loadProfessionals() {
+    this.userService.getProfessionals().subscribe(professionals => {
+      this.professionals = professionals;
+    });
+  }
+
+ 
+  
+  // Filter logic
   applyFilters() {
     this.appointments = this.allAppointments.filter(appt => {
       const apptDate = new Date(appt.date).toISOString().slice(0, 10);
@@ -103,9 +108,19 @@ export class AppointmentListComponent implements OnInit {
   }
 
   editAppointment(appt: any) {
-    // Ici tu peux ouvrir un dialog pour éditer si besoin
-    console.log('Edit', appt);
+    const dialogRef = this.dialog.open(RescheduleAppointmentComponent, {
+      width: '400px',
+      data: appt
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.loadAppointments();
+      }
+    });
   }
+  
+  
 
   deleteAppointment(appt: any) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -123,7 +138,6 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
-  
 
  getStatusColor(status: string): string {
   switch (status) {
@@ -134,5 +148,6 @@ export class AppointmentListComponent implements OnInit {
     default: return '';
   }
 }
+
 
 }

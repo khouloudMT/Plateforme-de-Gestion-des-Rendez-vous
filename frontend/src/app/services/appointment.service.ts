@@ -26,4 +26,9 @@ export class AppointmentService {
   deleteAppointment(appointmentId: string) {
     return this.http.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
   }
+
+  getAppointmentById(appointmentId: string) {
+    return this.http.get(`http://localhost:5000/api/appointments/${appointmentId}`);
+  }
+  
 }

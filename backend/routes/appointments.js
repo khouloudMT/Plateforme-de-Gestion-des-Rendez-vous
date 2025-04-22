@@ -128,6 +128,37 @@ router.get('/my-appointments',
     }
 });
 
+// @route   GET api/appointments/:id
+// @desc    Get appointment by ID
+// @access  Private
+router.get('/:id', 
+    protect, 
+    authorize('client', 'professional'), 
+    async (req, res) => {
+    try {
+      const appointment = await Appointment.findById(req.params.id.trim())
+        .populate('client', 'name email')
+        .populate('professional', 'name email');
+  
+      if (!appointment) {
+        return res.status(404).json({ msg: 'Appointment not found' });
+      }
+  
+      // Check if the user is either client or professional in the appointment
+      if (
+        req.user.id !== appointment.client._id.toString() &&
+        req.user.id !== appointment.professional._id.toString()
+      ) {
+        return res.status(401).json({ msg: 'Not authorized' });
+      }
+  
+      res.json(appointment);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
+
 // @route   PUT api/appointments/:id
 // @desc    Update appointment
 // @access  Private
