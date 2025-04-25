@@ -20,7 +20,10 @@ export class AppointmentStatsComponent implements OnChanges {
 
   private calculateStats() {
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const isSameDay = (d1: Date, d2: Date) =>
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
 
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay());
@@ -36,12 +39,9 @@ export class AppointmentStatsComponent implements OnChanges {
 
     this.appointments.forEach(appt => {
       const apptDate = new Date(appt.date);
-      const apptDateStr = apptDate.toISOString().split('T')[0];
-
-      if (apptDateStr === todayStr) {
+      if (isSameDay(apptDate, now)) {
         this.todayCount++;
       }
-
       if (apptDate >= startOfWeek && apptDate <= endOfWeek) {
         this.weeklyCount++;
       }

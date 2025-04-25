@@ -22,21 +22,18 @@ export class AuthService {
   }
   getToken(): string | null {
     if (typeof window !== 'undefined' && localStorage) {
-      const token = localStorage.getItem('token');
-      console.log('Retrieved token:', token);
-      return token;
-    } else {
-      console.warn('localStorage is not available in this environment');
-      return null;
+      return localStorage.getItem('token');
     }
-  }
+    return null;
+  }  
 
   login(email: string, password: string) {
     return this.http.post<any>('http://localhost:5000/api/auth/login', { email, password })
     .pipe(
       tap(response => {
         if (response.token) {
-          localStorage.setItem('token', response.token);
+          localStorage.setItem('token', response.token); // JWT token
+         
           const decoded: any= jwtDecode(response.token);
           localStorage.setItem('currentUser', JSON.stringify(decoded.user));
           this.currentUserSubject.next(decoded.user);
@@ -71,4 +68,18 @@ export class AuthService {
     const user = this.currentUserValue;
     return user ? user.role : null;
   }
+
+
+// ROLE CHECKING METHODS
+  // getRole(): string {
+  //   return localStorage.getItem('userRole') || '';
+  // }
+  
+  // isClient(): boolean {
+  //   return this.getRole() === 'client';
+  // }
+  
+  // isProfessional(): boolean {
+  //   return this.getRole() === 'professional';
+  // }
 }

@@ -33,7 +33,11 @@ export const routes: Routes = [
             path: 'professional', 
             component: ProfessionalDashboardComponent,
             canActivate: [roleGuard],
-            data: { role: 'professional' }
+            data: { role: 'professional' },
+            children: [
+              { path: '', component: AppointmentListComponent },
+              { path: 'calendar', component: CalendarViewComponent },
+            ]
           },
           // **** Client ROUTES ****
           { 
@@ -42,7 +46,7 @@ export const routes: Routes = [
             canActivate: [roleGuard],
             data: { role: 'client' },
             children: [
-              { path: 'appointments', component: AppointmentListComponent },
+              { path: '', component: AppointmentListComponent },
               { path: 'calendar', component: CalendarViewComponent },
               { path: 'professionals', component: ProfessionalListComponent },
             ]

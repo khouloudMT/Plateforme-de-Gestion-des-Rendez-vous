@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { AppointmentService } from '../../../services/appointment.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-professional-dashboard',
@@ -13,16 +14,19 @@ import { AppointmentService } from '../../../services/appointment.service';
     MatTableModule,
     MatIconModule,
     MatButtonModule,
-    MatChipsModule
+    MatChipsModule,
+    RouterModule
   ],
   templateUrl: './professional-dashboard.component.html',
   styleUrl: './professional-dashboard.component.scss'
 })
 export class ProfessionalDashboardComponent {
   appointments: any[] = [];
-  displayedColumns: string[] = ['client', 'date', 'time', 'status', 'actions'];
+  displayedColumns: string[] = ['client','phone', 'date', 'time', 'status', 'actions'];
 
-  constructor(private appointmentService: AppointmentService) {
+  constructor(
+    private appointmentService: AppointmentService) 
+    {
     this.loadAppointments();
   }
 

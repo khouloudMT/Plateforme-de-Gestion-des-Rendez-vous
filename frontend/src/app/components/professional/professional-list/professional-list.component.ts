@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-professional-list',
@@ -17,6 +19,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    CardModule,
+    ButtonModule
   ],
   templateUrl: './professional-list.component.html',
   styleUrls: ['./professional-list.component.scss']
@@ -101,6 +105,7 @@ export class ProfessionalListComponent implements OnInit {
       ? 'assets/images/femaleavatar.png' 
       : 'assets/images/maleavatar.png';
   }
+
 
   
 }

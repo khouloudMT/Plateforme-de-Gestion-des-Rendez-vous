@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { RouterLink, RouterModule, RouterOutlet } from '@angular/router';
 import { AppointmentService } from '../../../services/appointment.service';
-import { UserService } from '../../../services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 
@@ -29,12 +28,10 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
 })
 export class ClientDashboardComponent {
   appointments: any[] = [];
-  professionals: any[] = [];
   displayedColumns: string[] = ['professional', 'date', 'time', 'status', 'actions'];
   
   constructor(
     private appointmentService: AppointmentService,
-    private userService: UserService,
     private dialog: MatDialog
   ) {
     this.loadAppointments();

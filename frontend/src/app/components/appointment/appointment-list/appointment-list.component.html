@@ -1,71 +1,137 @@
-<div class="appointment-container">
-
-  <!-- Stats BAr-->
+<div class="dashboard-container">
+  <!-- Stats Bar -->
   <app-appointment-stats [appointments]="appointments"></app-appointment-stats>
 
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <div class="filters">
+        <div class="date-filters">
+          <input 
+            type="date" 
+            [(ngModel)]="fromDate" 
+            class="date-input"
+            placeholder="From Date"
+          >
+          <input 
+            type="date" 
+            [(ngModel)]="toDate" 
+            class="date-input"
+            placeholder="To Date"
+          >
+        </div>
+        <select [(ngModel)]="selectedStatus" class="status-select">
+          <option value="">All Status</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+        <button class="filter-btn" (click)="applyFilters()">
+          <mat-icon>filter_list</mat-icon>
+          Filter
+        </button>
+      </div>
+      
+      <div *ngIf="userRole === 'client'" class="new-appointment">
+        <button mat-raised-button color="primary" (click)="openAppointmentForm()">
+          <mat-icon>add</mat-icon> New Appointment
+        </button>
+      </div>
+    </div>
 
+    <!-- Appointments Table -->
+    <div class="table-container">
+      <table class="appointments-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th *ngIf="userRole === 'client'">Professional</th>
+            <th *ngIf="userRole === 'client'">Profession</th>
+            <th *ngIf="userRole === 'professional'">Client</th>
+            <th *ngIf="userRole === 'professional'">Phone</th>
+            <th *ngIf="userRole === 'professional'">Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let appt of appointments">
+            <td>{{appt.date | date:'mediumDate'}}</td>
+            <td>{{appt.time}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.name}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.profession}}</td>
+            <td *ngIf="userRole === 'professional'">{{appt.client.name}}</td>
+            <td *ngIf="userRole === 'professional'">{{appt.client.phone}}</td>
+            <td *ngIf="userRole === 'professional'">{{appt.client.email}}</td>
+            <td>
+              <span class="status-chip" [ngClass]="appt.status.toLowerCase()">
+                {{appt.status}}
+              </span>
+            </td>
+            <td>
+            <!-- Client Actions -->
+              <div *ngIf="userRole === 'client'" class="action-buttons">
+                <button mat-icon-button color="primary" 
+                        (click)="editAppointment(appt)"
+                        [disabled]="appt.status !== 'pending'"
+                        matTooltip="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="cancelAppointment(appt)"
+                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed'"
+                        matTooltip="Cancel">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
 
+              <!-- Professional Actions -->
+              <div *ngIf="userRole === 'professional'" class="action-buttons">
+                <button mat-icon-button color="primary"
+                        (click)="confirmAppointment(appt)"
+                        [disabled]="appt.status !== 'pending'"
+                        matTooltip="Confirm">
+                  <mat-icon>check_circle</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="cancelAppointment(appt)"
+                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed'"
+                        matTooltip="Cancel">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
+            </td>
 
-  <div class="actions">
-    <button mat-raised-button color="primary" (click)="openAppointmentForm()">
-      <mat-icon>add</mat-icon> New Appointment
-    </button>
+   
+          </tr>
+        </tbody>
+      </table>
+     
+      <!-- Pagination -->
+      <div class="pagination">
+        <div class="pagination-info">
+          Showing {{startIndex + 1}} to {{endIndex}} of {{totalItems}} entries
+        </div>
+        <div class="pagination-controls">
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 0"
+            (click)="changePage(currentPage - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="page-number">Page {{currentPage + 1}}</span>
+          <button 
+            class="page-btn" 
+            [disabled]="(currentPage + 1) * pageSize >= totalItems"
+            (click)="changePage(currentPage + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
-
-  <!-- Filters -->
-  <div class="filters">
-    <input type="date" [(ngModel)]="fromDate">
-    <input type="date" [(ngModel)]="toDate">
-    <select [(ngModel)]="selectedStatus">
-      <option value="">All</option>
-      <option value="confirmed">Confirmed</option>
-      <option value="cancelled">Cancelled</option>
-      <option value="pending">Pending</option>
-      <option value="completed">Completed</option>
-    </select>
-    <button class="filter-btn" (click)="applyFilters()"><mat-icon>filter_alt</mat-icon></button>
-
-  </div>
-
-
-  <!-- Appointment Table -->
-  <div class="appointments-table">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Professional</th>
-          <th>Profession</th>
-          <th>Status</th>
-          <th>Edit</th>
-          <th>CAncel</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let appt of appointments">
-          <td>{{appt.date | date:'mediumDate'}}</td>
-          <td>{{appt.time}}</td>
-          <td>{{appt.professional.name}}</td>
-          <td>{{appt.professional.profession}}</td>
-          
-          <td>
-            <mat-chip [color]="getStatusColor(appt.status)" selected>
-              {{ appt.status }}
-            </mat-chip>
-          </td>
-         
-          <td>
-            <button class="edit-btn" (click)="editAppointment(appt)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-          <td>
-            <button class="delete-btn" (click)="deleteAppointment(appt)"><mat-icon>delete</mat-icon></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
 </div>

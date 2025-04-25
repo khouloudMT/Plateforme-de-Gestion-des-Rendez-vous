@@ -8,7 +8,7 @@ const sendEmail = require('../utils/sendEmail');
 
 // @route   POST api/appointments
 // @desc    Create an appointment
-// @access  Private
+// @access  Private Client
 router.post('/', [
     protect,
     authorize('client'),
@@ -101,7 +101,7 @@ router.get('/',
 
 // @route   GET api/appointments/me
 // @desc    Get current user's appointments
-// @access  Private
+// @access  Private Client/Professional
 router.get('/my-appointments', 
     protect,
     authorize('client', 'professional'),
@@ -121,16 +121,34 @@ router.get('/my-appointments',
             return res.status(401).json({ msg: 'Not authorized' });
         }
 
+        await updateOutdatedAppointments(appointments);
+
         res.json(appointments);
+        
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
 });
 
+const updateOutdatedAppointments = async (appointments) => {
+    const now = new Date();
+  
+    for (let appt of appointments) {
+      const appointmentDateTime = new Date(`${appt.date}T${appt.time}`);
+      const limitTime = new Date(appointmentDateTime.getTime() + 30 * 60 * 1000);
+//   && appt.status === 'confirmed'
+      if (now > limitTime ) {
+        appt.status = 'completed';
+        appt.completedAt = now;
+        await appt.save();
+      }
+    }
+  };
+
 // @route   GET api/appointments/:id
 // @desc    Get appointment by ID
-// @access  Private
+// @access  Private Client/Professional
 router.get('/:id', 
     protect, 
     authorize('client', 'professional'), 
@@ -180,40 +198,54 @@ router.put('/:id',
             return res.status(404).json({ msg: 'Appointment not found' });
         }
 
-        // Check if user is client or professional associated with the appointment
-        if (req.user.id !== appointment.client.toString() && req.user.id !== appointment.professional.toString()) {
+        const userIsClient = req.user.id === appointment.client.toString();
+        const userIsPro = req.user.id === appointment.professional.toString();
+
+        if (!userIsClient && !userIsPro) {
             return res.status(401).json({ msg: 'Not authorized' });
-        }
-
-        // Only allow status change by professional
-        if (status && req.user.id !== appointment.professional.toString()) {
+          }
+    
+          // Status update only by professional
+          if (status && !userIsPro) {
             return res.status(401).json({ msg: 'Only the professional can change the status' });
-        }
-
-        // Check for time conflicts if time is being updated
-        if (date || time) {
+          }
+    
+          // Time conflict check (optional)
+          if (date || time) {
             const checkDate = date || appointment.date;
             const checkTime = time || appointment.time;
-            const existingAppointment = await Appointment.findOne({
-                professional: appointment.professional,
-                date: checkDate,
-                _id: { $ne: appointment._id },
-                $or: [
-                    {
-                        time: { $lt: checkTime }
-                    }
-                ]
+    
+            const conflict = await Appointment.findOne({
+              professional: appointment.professional,
+              date: checkDate,
+              _id: { $ne: appointment._id },
+              $or: [{ time: { $lt: checkTime } }]
             });
-
-            if (existingAppointment) {
-                return res.status(400).json({ msg: 'Time slot already booked' });
+    
+            if (conflict) {
+              return res.status(400).json({ msg: 'Time slot already booked' });
             }
-        }
-
+          }
+        
+        // Update values
         appointment.date = date || appointment.date;
         appointment.time = time || appointment.time;
         appointment.status = status || appointment.status;
         appointment.notes = notes || appointment.notes;
+
+        if (userIsPro && status) {
+            appointment.status = status;
+          }
+
+        // Auto mark as completed if past + 30min and was confirmed
+        const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
+        const now = new Date();
+        const limitTime = new Date(appointmentDateTime.getTime() + 30 * 60 * 1000);
+        // && appointment.status === 'confirmed'
+        if (now > limitTime ) {
+            appointment.status = 'completed';
+            appointment.completedAt = now;
+        }
 
         await appointment.save();
 
@@ -282,7 +314,6 @@ router.delete('/:id', protect,
         res.status(500).json({ message: "Server Error" });
     }
 });
-
 
 
 

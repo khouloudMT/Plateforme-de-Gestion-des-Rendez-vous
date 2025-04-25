@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -25,13 +26,15 @@ import { CommonModule } from '@angular/common';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatIconModule,
-    RouterLink
+    RouterLink,
+    MatSnackBarModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
   fb: FormBuilder = inject(FormBuilder);
+  
 
   registerForm = this.fb.group({
     name: ['', Validators.required],
@@ -48,7 +51,8 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.registerForm.get('role')?.valueChanges.subscribe(role => {
       const professionControl = this.registerForm.get('profession');
@@ -61,6 +65,12 @@ export class RegisterComponent {
     });
   }
 
+  ngOnInit(): void {}
+
+  setGender(gender: 'M' | 'F') {
+    this.registerForm.patchValue({ gender });
+  }
+
   onSubmit() {
     if (this.registerForm.invalid) return;
 
@@ -68,9 +78,14 @@ export class RegisterComponent {
     this.authService.register(this.registerForm.value)
       .subscribe({
         next: () => {
+          this.snackBar.open('Registration successful!', 'Close', { duration: 3000 });
           this.router.navigate(['/login']);
         },
-        error: () => {
+        error: (error) => {
+          this.loading = false;
+          this.snackBar.open(error.message || 'Registration failed', 'Close', { duration: 3000 });
+        },
+        complete: () => {
           this.loading = false;
         }
       });

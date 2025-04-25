@@ -12,6 +12,11 @@ import { RescheduleAppointmentComponent } from '../reschedule-appointment/resche
 import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
 import { UserService } from '../../../services/user.service';
 import { AppointmentStatsComponent } from '../appointment-stats/appointment-stats.component';
+import { AuthService } from '../../../services/auth.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-appointment-list',
@@ -23,7 +28,10 @@ import { AppointmentStatsComponent } from '../appointment-stats/appointment-stat
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
+    MatTabsModule,
+    MatFormFieldModule,
     AppointmentStatsComponent
+
   ],
 
   styleUrls: ['./appointment-list.component.scss']
@@ -31,46 +39,93 @@ import { AppointmentStatsComponent } from '../appointment-stats/appointment-stat
 
 export class AppointmentListComponent implements OnInit {
   allAppointments: any[] = [];
-  displayedColumns: string[] = ['professional', 'date', 'time', 'status', 'actions'];
-  statusOptions: string[] = ['confirmed', 'pending', 'canceled'];
+  filteredAppointments: any[] = [];
+  pagedAppointments: any[] = [];
+
+  displayedColumns: string[] = [];
+
   fromDate: string = '';
   toDate: string = '';
   selectedStatus: string = '';
+  selectedTabIndex: number = 0; // Index de l'onglet sélectionné
+
   @Input() appointments: any[] = [];
   @Input() professionals: any[] = [];
 
+  userRole: string | null = null;
+
+
+  // Pagination
   currentPage: number = 0;
-  pageSize: number = 7; // Nombre d'éléments par page
-  totalItems = this.appointments.length;
-  pagedAppointments: any[] = []; // Liste paginée des rendez-vous
+  pageSize: number = 7;
+  totalItems: number = 0;
+  startIndex: number = 0;
+  endIndex: number = 0;
   
+  private notificationSubscription!: Subscription;
+
 
   constructor(
     private appointmentService: AppointmentService,
     private dialog: MatDialog,
     private userService: UserService,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {}
 
+ 
+
   ngOnInit(): void {
+    this.userRole = this.authService.getUserRole();  // Récupérer le rôle de l'utilisateur
     this.loadAppointments();
     this.loadProfessionals();
+    this.setDisplayedColumns();
+    this.subscribeToNotifications();
     // this.loadRandomProfessionals();
   }
 
-  
-
+  setDisplayedColumns() {
+    if (this.userRole === 'client') {
+      this.displayedColumns = ['date', 'time', 'professional', 'profession', 'status', 'edit', 'cancel'];
+    } else if (this.userRole === 'professional') {
+      this.displayedColumns = ['date', 'time', 'client', 'phone', 'email', 'status', 'edit', 'cancel'];
+    }
+  }
 
   loadAppointments() {
     this.appointmentService.getClientAppointments().subscribe({
       next: (res: any[]) => {
         this.appointments = res;
-  
+        this.allAppointments = res; // Stocker tous les rendez-vous pour le filtrage
+        this.totalItems = this.appointments.length;
+        this.currentPage = 0;
+        this.updatePagedAppointments();
       },
       error: err => {
         console.error("Erreur chargement appointments", err);
       }
     });
   }
+
+  loadProfessionals() {
+    this.userService.getProfessionals().subscribe(professionals => {
+      this.professionals = professionals;
+    });
+  }
+
+  //Pagination
+  updatePagedAppointments() {
+    this.startIndex = this.currentPage * this.pageSize;
+    this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalItems);
+    this.pagedAppointments = this.appointments.slice(this.startIndex, this.endIndex);
+  }
+  changePage(newPage: number) {
+    if (newPage >= 0 && (newPage * this.pageSize) < this.totalItems) {
+      this.currentPage = newPage;
+      this.updatePagedAppointments();
+    }
+  }
+
 
   // Appointment form logic
   openAppointmentForm() {
@@ -83,27 +138,6 @@ export class AppointmentListComponent implements OnInit {
       if (result) {
         this.loadAppointments();
       }
-    });
-  }
-  loadProfessionals() {
-    this.userService.getProfessionals().subscribe(professionals => {
-      this.professionals = professionals;
-    });
-  }
-
- 
-  
-  // Filter logic
-  applyFilters() {
-    this.appointments = this.allAppointments.filter(appt => {
-      const apptDate = new Date(appt.date).toISOString().slice(0, 10);
-      const from = this.fromDate || '0000-01-01';
-      const to = this.toDate || '9999-12-31';
-
-      const dateMatch = apptDate >= from && apptDate <= to;
-      const statusMatch = this.selectedStatus ? appt.status?.toLowerCase() === this.selectedStatus.toLowerCase() : true;
-
-      return dateMatch && statusMatch;
     });
   }
 
@@ -119,35 +153,116 @@ export class AppointmentListComponent implements OnInit {
       }
     });
   }
-  
-  
 
-  deleteAppointment(appt: any) {
+  cancelAppointment(appointment: any) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: { message: 'Are you sure you want to cancel this appointment?' }
     });
-  
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.appointmentService.deleteAppointment(appt._id).subscribe(() => {
-          this.appointments = this.appointments.filter(a => a._id !== appt._id);
-          this.loadAppointments();
-        });
+        const currentUser = this.authService.currentUserValue;
+        
+        if (currentUser.role === 'client') {
+          this.appointmentService.clientCancels(appointment, currentUser, appointment.professional)
+            .subscribe(() => this.loadAppointments());
+        } else if (currentUser.role === 'professional') {
+          this.appointmentService.professionalUpdatesStatus(appointment, currentUser, appointment.client, 'cancelled')
+            .subscribe(() => this.loadAppointments());
+        }
+      }
+    });
+  }
+  
+  confirmAppointment(appointment: any) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '350px',
+      data: { message: 'Are you sure you want to confirm this appointment?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const currentUser = this.authService.currentUserValue;
+        
+        if (currentUser.role === 'professional') {
+          this.appointmentService.professionalUpdatesStatus(appointment, currentUser, appointment.client, 'confirmed')
+            .subscribe(() => this.loadAppointments());
+        }
       }
     });
   }
 
 
- getStatusColor(status: string): string {
-  switch (status) {
-    case 'confirmed': return 'primary';
-    case 'pending': return 'accent';
-    case 'cancelled': return 'warn';
-    case 'completed': return 'green';
-    default: return '';
+  // Notification logic
+  private subscribeToNotifications() {
+    this.notificationSubscription = this.appointmentService.getNotifications()
+      .subscribe(notification => {
+        this.snackBar.open(notification.message, 'Close', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        this.loadAppointments(); // Refresh the list
+      });
   }
-}
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+  }
+   
+  // Filter logic
+  applyFilters() {
+    const from = this.fromDate || '0000-01-01';
+    const to = this.toDate || '9999-12-31';
+
+    this.appointments = this.allAppointments.filter(appt => {
+      const apptDate = new Date(appt.date);
+      const apptDateOnly = `${apptDate.getFullYear()}-${(apptDate.getMonth() + 1).toString().padStart(2, '0')}-${apptDate.getDate().toString().padStart(2, '0')}`;
+
+      return apptDateOnly >= from && apptDateOnly <= to;
+    });
+
+    if (this.selectedStatus) {
+      this.appointments = this.appointments.filter(appt => 
+        appt.status?.toLowerCase() === this.selectedStatus.toLowerCase()
+      );
+    }
 
 
+    this.totalItems = this.appointments.length;
+    this.currentPage = 0;
+    this.updatePagedAppointments();
+  }
+
+  onTabChange(index: number): void {
+    this.selectedTabIndex = index;
+    this.filterAppointmentsByTab();
+  }
+
+  filterAppointmentsByTab() {
+    this.applyFilters();
+  }
+
+  getStatusFromTabIndex(index: number): string | null {
+    switch (index) {
+      case 1: return 'confirmed';
+      case 2: return 'cancelled';
+      case 3: return 'pending';
+      case 4: return 'completed';
+      default: return null;
+    }
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'confirmed': return 'primary';
+      case 'pending': return 'accent';
+      case 'cancelled': return 'warn';
+      case 'completed': return 'green';
+      default: return '';
+    }
+  }
 }

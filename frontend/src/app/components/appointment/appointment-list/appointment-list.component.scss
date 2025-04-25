@@ -1,204 +1,173 @@
-.appointment-container {
+.dashboard-container {
   padding: 20px;
-  font-family: Poppins, sans-serif;
   
-
-  .stats-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-
-    .stat-box {
-      flex: 1;
-      background: #f1f5f9;
-      padding: 16px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-
-      strong {
-        font-size: 1.5rem;
-        display: block;
-        font-weight: 600;
-  
-        span {
-          font-size: 0.875rem;
-          color: #64748b;
-        }
-      }
-
-      &.active {
-        background-color: #3f51b5;
-        color: white;
-      }
-      
-    }
+  .content-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
   }
-
 
   .header-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #1e293b;
-      margin: 0;
-    }
-  }
-
-  .table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .filters {
-
-    display: flex;
-      align-items: center;
+    .filters {
+      display: flex;
       gap: 12px;
+      align-items: center;
       flex-wrap: wrap;
-
-    input, select {
-      font-family: Poppins, sans-serif;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    mat-form-field {
-      width: 160px;
-    }
-
-    .filter-btn {
-      font-family: Poppins, sans-serif;
-      background-color: #3f51b5;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-    }
-  }
-
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: #e2d6f6;
-      font-weight: 500;
-  
-      .nav-buttons {
+    
+      .date-filters {
         display: flex;
-        background-color: #1e063e;
-        border-radius: 12px;
-        overflow: hidden;
-  
-        .nav-btn {
-          background: transparent;
-          border: none;
-          color: white;
-          padding: 6px 12px;
-          font-size: 16px;
-          cursor: pointer;
-  
-          &:hover:not(.disabled) {
-            background-color: rgba(255, 255, 255, 0.1);
-          }
-  
-          &.disabled {
-            background-color: white;
-            color: #ccc;
-            cursor: not-allowed;
-          }
+        gap: 8px;
+      }
+    
+      .date-input {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #1a202c;
+        background: white;
+        
+        &:focus {
+          outline: none;
+          border-color: #3f51b5;
+          box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.1);
+        }
+      }
+    
+      .status-select {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #1a202c;
+        background: white;
+        min-width: 120px;
+        
+        &:focus {
+          outline: none;
+          border-color: #3f51b5;
+          box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.1);
+        }
+      }
+    
+      .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #3f51b5;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    
+        &:hover {
+          background: #303f9f;
+        }
+    
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
         }
       }
     }
   }
-  
+
+  .table-container {
+    overflow-x: auto;
 
     .appointments-table {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
-    .custom-table {
       width: 100%;
       border-collapse: collapse;
 
       th, td {
-        padding: 16px;
+        padding: 12px;
         text-align: left;
-        border-bottom: 1px solid #f1f5f9;
-    
+        border-bottom: 1px solid #ddd;
       }
+
       th {
-        background: #f8fafc;
-        font-weight: 600;
-        color: #304562;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 0.5px;
-      }
-
-      td {
-        color: #1d1f23;
-        font-size: 0.875rem;
-
-        &.centered {
-          text-align: center;
-        }
-      }
-
-      tr:hover {
-        background-color: #f8fafc;
+        background-color: #f5f5f5;
+        font-weight: 500;
       }
 
       .action-buttons {
         display: flex;
-        justify-content: center;
         gap: 8px;
-      }
-  
-      mat-chip {
-        font-size: 0.75rem;
-        font-weight: 500;
-        min-height: 24px;
-        padding: 0 12px;
-      }
-      
-  
-      .edit-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #304562;
-      }
-  
-      .delete-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
       }
     }
   }
+
+  .status-chip {
+    padding: 4px 12px;
+    border-radius: 16px;
+    color: white;
+    font-size: 14px;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+
+    &.confirmed {
+      background-color: #4caf50;
+    }
+    &.pending {
+      background-color: #ff9800;
+    }
+    &.cancelled {
+      background-color: #f44336;
+    }
+    &.completed {
+      background-color: #2196f3;
+    }
   }
 
-  
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 16px;
+    border-top: 1px solid #ddd;
+
+    .pagination-info {
+      color: #666;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .page-btn {
+        background: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &:not(:disabled):hover {
+          background-color: #f5f5f5;
+        }
+      }
+
+      .page-number {
+        color: #666;
+      }
+    }
+  }
+}
