@@ -66,8 +66,14 @@ router.post('/', [
             subject: 'Appointment Confirmation',
             text: `Your appointment with ${savedAppointment.professional.name} on ${date} at ${time} has been booked.`
         };
+        const emailData2 = {
+            to: professionalUser.email,
+            subject: 'Appointment booked',
+            text: `Your appointment with ${savedAppointment.client.name} on ${date} at ${time} has been booked.`
+        };
 
         await sendEmail(emailData);
+        await sendEmail(emailData2);
 
         res.json(appointment);
     } catch (err) {
@@ -131,20 +137,7 @@ router.get('/my-appointments',
     }
 });
 
-const updateOutdatedAppointments = async (appointments) => {
-    const now = new Date();
-  
-    for (let appt of appointments) {
-      const appointmentDateTime = new Date(`${appt.date}T${appt.time}`);
-      const limitTime = new Date(appointmentDateTime.getTime() + 30 * 60 * 1000);
-//   && appt.status === 'confirmed'
-      if (now > limitTime ) {
-        appt.status = 'completed';
-        appt.completedAt = now;
-        await appt.save();
-      }
-    }
-  };
+
 
 // @route   GET api/appointments/:id
 // @desc    Get appointment by ID
@@ -205,10 +198,7 @@ router.put('/:id',
             return res.status(401).json({ msg: 'Not authorized' });
           }
     
-          // Status update only by professional
-          if (status && !userIsPro) {
-            return res.status(401).json({ msg: 'Only the professional can change the status' });
-          }
+    
     
           // Time conflict check (optional)
           if (date || time) {
@@ -301,9 +291,15 @@ router.delete('/:id', protect,
             subject: 'Appointment Cancelled',
             text: `Your appointment with ${populatedAppointment.professional.name} on ${appointment.date} has been cancelled.`
         };
+        const emailData2 = {
+            to: populatedAppointment.professional.email,
+            subject: 'Appointment Cancelled',
+            text: `Your appointment with ${populatedAppointment.client.name} on ${appointment.date} has been cancelled.`
+        };
 
         await await Appointment.findByIdAndDelete(req.params.id);
         await sendEmail(emailData);
+        await sendEmail(emailData2);
 
         res.json({ msg: 'Appointment removed' });
     } catch (err) {
