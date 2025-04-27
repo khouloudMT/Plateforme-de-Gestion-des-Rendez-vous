@@ -17,15 +17,15 @@ export class AppointmentService {
 
   
   getClientAppointments() {
-    return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
+    return this.http.get<any[]>(`http://localhost:5000/api/appointments/my-appointments`);
   }
 
   getProfessionalAppointments() {
-    return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
+    return this.http.get<any[]>(`http://localhost:5000/api/appointments/my-appointments`);
   }
 
   createAppointment(appointmentData: any) {
-    return this.http.post('http://localhost:5000/api/appointments', appointmentData);
+    return this.http.post(`http://localhost:5000/api/appointments`, appointmentData);
   }
 
   updateAppointment(appointmentId: string, updateData: any) {
@@ -37,7 +37,7 @@ export class AppointmentService {
   }
 
   getAppointmentById(appointmentId: string) {
-    return this.http.get(`v/${appointmentId}`);
+    return this.http.get(`http://localhost:5000/api/appointments/${appointmentId}`);
   }
 
   // Notification stream

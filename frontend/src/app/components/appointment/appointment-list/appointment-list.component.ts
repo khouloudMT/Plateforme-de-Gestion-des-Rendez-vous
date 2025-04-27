@@ -55,12 +55,10 @@ export class AppointmentListComponent implements OnInit {
   userRole: string | null = null;
 
 
-  // Pagination
-  currentPage: number = 0;
-  pageSize: number = 7;
-  totalItems: number = 0;
-  startIndex: number = 0;
-  endIndex: number = 0;
+  // Pagination variables
+  pageSize: number = 5;
+  currentPage: number = 1;
+  totalPages: number = 1;
   
   private notificationSubscription!: Subscription;
 
@@ -97,8 +95,9 @@ export class AppointmentListComponent implements OnInit {
       next: (res: any[]) => {
         this.appointments = res;
         this.allAppointments = res; // Stocker tous les rendez-vous pour le filtrage
-        this.totalItems = this.appointments.length;
-        this.currentPage = 0;
+
+        this.totalPages = Math.ceil(this.professionals.length / this.pageSize);
+        this.currentPage = 1;
         this.updatePagedAppointments();
       },
       error: err => {
@@ -114,14 +113,21 @@ export class AppointmentListComponent implements OnInit {
   }
 
   //Pagination
+  // Pagination logic
   updatePagedAppointments() {
-    this.startIndex = this.currentPage * this.pageSize;
-    this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalItems);
-    this.pagedAppointments = this.appointments.slice(this.startIndex, this.endIndex);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedAppointments = this.professionals.slice(start, end);
   }
-  changePage(newPage: number) {
-    if (newPage >= 0 && (newPage * this.pageSize) < this.totalItems) {
-      this.currentPage = newPage;
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagedAppointments();
+    }
+  }
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
       this.updatePagedAppointments();
     }
   }
@@ -144,7 +150,7 @@ export class AppointmentListComponent implements OnInit {
   editAppointment(appt: any) {
     const dialogRef = this.dialog.open(RescheduleAppointmentComponent, {
       width: '400px',
-      data: appt
+      data: { _id: appt._id }
     });
   
     dialogRef.afterClosed().subscribe(result => {
@@ -232,8 +238,8 @@ export class AppointmentListComponent implements OnInit {
     }
 
 
-    this.totalItems = this.appointments.length;
-    this.currentPage = 0;
+    this.totalPages = Math.ceil(this.professionals.length / this.pageSize);
+    this.currentPage = 1;
     this.updatePagedAppointments();
   }
 
