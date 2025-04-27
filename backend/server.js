@@ -45,8 +45,6 @@ app.use('/api/appointments', appointments);
 app.use('/api/professionals', professionals);
 
 
-
-
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
     // Set static folder

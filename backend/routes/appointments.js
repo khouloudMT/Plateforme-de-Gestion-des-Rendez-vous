@@ -205,10 +205,7 @@ router.put('/:id',
             return res.status(401).json({ msg: 'Not authorized' });
           }
     
-          // Status update only by professional
-          if (status && !userIsPro) {
-            return res.status(401).json({ msg: 'Only the professional can change the status' });
-          }
+        
     
           // Time conflict check (optional)
           if (date || time) {
