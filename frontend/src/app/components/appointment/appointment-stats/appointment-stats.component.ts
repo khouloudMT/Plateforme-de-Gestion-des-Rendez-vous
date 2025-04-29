@@ -38,10 +38,15 @@ export class AppointmentStatsComponent implements OnChanges {
     this.pendingCount = 0;
 
     this.appointments.forEach(appt => {
+      
+      const createdAt = new Date(appt.createdAt || appt.created_at);
+      const isRecent = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 3;
       const apptDate = new Date(appt.date);
+
       if (isSameDay(apptDate, now)) {
         this.todayCount++;
       }
+
       if (apptDate >= startOfWeek && apptDate <= endOfWeek) {
         this.weeklyCount++;
       }
@@ -50,8 +55,6 @@ export class AppointmentStatsComponent implements OnChanges {
         this.upcomingCount++;
       }
 
-      const createdAt = new Date(appt.createdAt || appt.created_at);
-      const isRecent = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 3;
       if (isRecent) {
         this.recentCount++;
       }

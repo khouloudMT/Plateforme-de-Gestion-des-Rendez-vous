@@ -56,7 +56,8 @@ router.post('/', [
 
         // Populate professional details for email
         const savedAppointment = await Appointment.findById(appointment._id)
-            .populate('professional', 'name email');
+            .populate('professional', 'name email')
+            .populate('client', 'name email');
 
         // Send confirmation email
         const client = await User.findById(req.user.id);
@@ -126,8 +127,6 @@ router.get('/my-appointments',
         } else {
             return res.status(401).json({ msg: 'Not authorized' });
         }
-
-        await updateOutdatedAppointments(appointments);
 
         res.json(appointments);
         
@@ -209,7 +208,7 @@ router.put('/:id',
               professional: appointment.professional,
               date: checkDate,
               _id: { $ne: appointment._id },
-              $or: [{ time: { $lt: checkTime } }]
+              time: checkTime,
             });
     
             if (conflict) {
@@ -249,8 +248,15 @@ router.put('/:id',
             subject: 'Appointment Updated',
             text: `Your appointment with ${populatedAppointment.professional.name} has been updated. New details: ${appointment.date} at ${appointment.time}. Status: ${appointment.status}`
         };
+        const emailData2 = {
+            to: populatedAppointment.professional.email,
+            subject: 'Appointment Updated',
+            text: `Your appointment with ${populatedAppointment.client.name} has been updated. New details: ${appointment.date} at ${appointment.time}. Status: ${appointment.status}`
+        };
 
         await sendEmail(emailData);
+        await sendEmail(emailData2);
+
 
         res.json(appointment);
     } catch (err) {

@@ -55,7 +55,10 @@ export class RescheduleAppointmentComponent implements OnInit {
 
   ngOnInit(): void {
     this.timeSlots = this.generateTimeSlots();
-    this.loadAppointment();
+    if (this.data && this.data._id) {
+      this.appointment._id = this.data._id;
+      this.loadAppointment();
+    }
   }
 
   generateTimeSlots(): string[] {
@@ -72,16 +75,14 @@ export class RescheduleAppointmentComponent implements OnInit {
   }
 
   loadAppointment() {
-    if (!this.data || !this.data._id) {
-      console.error("No appointment ID provided.");
-      return;
-    }
-
     this.appointmentService.getAppointmentById(this.data._id.trim()).subscribe({
       next: (res: any) => {
+        // Convert the date to the format expected by the datepicker
+        const dateObj = new Date(res.date);
+        const formattedDate = dateObj.toISOString().split('T')[0];
         this.appointment = {
           _id: res._id || '', // Ensure _id is included
-          date: res.date?.split('T')[0], // yyyy-mm-dd
+          date: formattedDate , // yyyy-mm-dd
           time: res.time,
           notes: res.notes || ''
         };
@@ -89,22 +90,37 @@ export class RescheduleAppointmentComponent implements OnInit {
       },
       error: err => {
         console.error("Failed to load appointment", err);
+        this.snackBar.open('Failed to load appointment details', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
 
   onReschedule() {
+
+    if (!this.appointment._id) {
+      this.snackBar.open('Invalid appointment ID', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+    if (!this.appointment.date || !this.appointment.time) {
+      this.snackBar.open('Date and Time are required', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
     const updatedData = {
       date: this.appointment.date,
       time: this.appointment.time,
       notes: this.appointment.notes
     };
-    
-    if (!this.appointment.date || !this.appointment.time) {
-      alert("Date and Time are required.");
-      return;
-    }
-
+  
     this.appointmentService.updateAppointment(this.appointment._id, updatedData).subscribe({
       next: (res) => {
         this.snackBar.open('Appointment updated successfully!', 'Close', {
