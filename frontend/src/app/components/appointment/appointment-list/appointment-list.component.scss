@@ -131,43 +131,6 @@
     }
   }
 
-  .pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding: 16px;
-    border-top: 1px solid #ddd;
-
-    .pagination-info {
-      color: #666;
-    }
-
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      .page-btn {
-        background: none;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 4px 8px;
-        cursor: pointer;
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        &:not(:disabled):hover {
-          background-color: #f5f5f5;
-        }
-      }
-
-      .page-number {
-        color: #666;
-      }
-    }
-  }
+    /* Add encapsulation: ViewEncapsulation.None in your component TS */
+  
 }

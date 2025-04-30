@@ -69,17 +69,4 @@ export class AuthService {
     return user ? user.role : null;
   }
 
-
-// ROLE CHECKING METHODS
-  // getRole(): string {
-  //   return localStorage.getItem('userRole') || '';
-  // }
-  
-  // isClient(): boolean {
-  //   return this.getRole() === 'client';
-  // }
-  
-  // isProfessional(): boolean {
-  //   return this.getRole() === 'professional';
-  // }
 }

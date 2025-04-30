@@ -1,0 +1,17 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+  
+    .main-content {
+      flex: 1;
+      background-color: #f5f7fa;
+      padding: 24px;
+      overflow-y: auto;
+      transition: margin-left 0.3s ease;
+  
+      &.collapsed {
+        margin-left: 80px;
+      }
+    }
+  }
+  

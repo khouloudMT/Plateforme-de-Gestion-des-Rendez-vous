@@ -1,0 +1,34 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+    <div class="sidebar-header">
+      <button mat-icon-button class="toggle-btn" (click)="toggleSidebar()">
+        <mat-icon>{{ isCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
+    </div>
+  
+    <div class="sidebar-content">
+      <div class="profile-section">
+        <div class="user-avatar">
+          <div class="avatar">{{ userName | initials }}</div>
+          <div class="user-info" *ngIf="!isCollapsed">
+            <h3 class="user-name">{{ userName }}</h3>
+            <p class="user-email">{{ userEmail }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <nav class="navigation">
+        <ul class="nav-menu">
+          <li class="nav-item" *ngFor="let item of navItems">
+            <a class="nav-link" 
+               [routerLink]="item.link" 
+               routerLinkActive="active"
+               [matTooltip]="isCollapsed ? item.label : null"
+               matTooltipPosition="right">
+              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>

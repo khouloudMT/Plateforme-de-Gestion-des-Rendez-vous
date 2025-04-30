@@ -10,18 +10,18 @@
         <div class="date-filters">
           <input 
             type="date" 
-            [(ngModel)]="fromDate" 
+            formControlName="fromDate" 
             class="date-input"
             placeholder="From Date"
           >
           <input 
             type="date" 
-            [(ngModel)]="toDate" 
+            formControlName="toDate" 
             class="date-input"
             placeholder="To Date"
           >
         </div>
-        <select [(ngModel)]="selectedStatus" class="status-select">
+        <select formControlName="selectedStatus" class="status-select">
           <option value="">All Status</option>
           <option value="confirmed">Confirmed</option>
           <option value="cancelled">Cancelled</option>
@@ -51,20 +51,18 @@
             <th *ngIf="userRole === 'client'">Professional</th>
             <th *ngIf="userRole === 'client'">Profession</th>
             <th *ngIf="userRole === 'professional'">Client</th>
-            <th *ngIf="userRole === 'professional'">Phone</th>
             <th *ngIf="userRole === 'professional'">Email</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let appt of appointments">
+          <tr *ngFor="let appt of pagedAppointments">
             <td>{{appt.date | date:'mediumDate'}}</td>
             <td>{{appt.time}}</td>
             <td *ngIf="userRole === 'client'">{{appt.professional.name}}</td>
             <td *ngIf="userRole === 'client'">{{appt.professional.profession}}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.name}}</td>
-            <td *ngIf="userRole === 'professional'">{{appt.client.phone}}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.email}}</td>
             <td>
               <span class="status-chip" [ngClass]="appt.status.toLowerCase()">
@@ -111,26 +109,21 @@
       </table>
      
       <!-- Pagination -->
-      <div class="pagination">
+      <div class="pagination-container">
         <div class="pagination-info">
-          Showing {{ currentPage }} of {{ totalPages }} pages
-        </div>
-        <div class="pagination-controls">
-          <button 
-            class="page-btn" 
-            [disabled]="currentPage === 1"
-            (click)="previousPage()">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <span class="page-number">Page {{ currentPage }} / {{ totalPages }}</span>
-          <button 
-            class="page-btn" 
-            [disabled]="currentPage === totalPages"
-            (click)="nextPage()">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
+    
+        
+        
+        <mat-paginator [length]="appointments.length"
+                       [pageSize]="pageSize"
+                       [pageIndex]="currentPage - 1"
+                       [pageSizeOptions]="[5, 10, 25]"
+                       (page)="handlePageEvent($event)"
+                       hidePageSize="true"
+                       aria-label="Select page">
+        </mat-paginator>
       </div>
+    </div>
 
     </div>
   </div>
