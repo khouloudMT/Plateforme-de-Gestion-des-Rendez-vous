@@ -8,6 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
+import { AppointmentFormComponent } from '../../appointment/appointment-form/appointment-form.component';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '../../../services/auth.service';
+
 
 @Component({
   selector: 'app-professional-list',
@@ -41,11 +45,19 @@ export class ProfessionalListComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
 
-  constructor(private userService: UserService) {}
+  // UseRole
+  userRole: string | null = null;
+
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+    private dialog: MatDialog
+  ) {}
 
   // Initialize the component and load professionals
   ngOnInit(): void {
     this.loadProfessionals();
+    this.userRole = this.authService.getUserRole(); 
   }
 
   // Load all professionals 
@@ -106,6 +118,26 @@ export class ProfessionalListComponent implements OnInit {
       : 'assets/images/maleavatar.png';
   }
 
+  openBookingDialog(professional: any): void {
+    this.dialog.open(AppointmentFormComponent, {
+      width: '500px',
+      data: {
+        selectedProfessionalId: professional._id,
+        professionals: this.professionals
+      }
+    });
+  }
 
+
+  // Admin functionality to delete and edit a professional
+  editProfessional(prof: any) {
+    // TODO: Open dialog to edit professional
+    console.log("Editing", prof);
+  }
+  
+  deleteProfessional(prof: any) {
+    // TODO: Confirm and delete professional
+    console.log("Deleting", prof);
+  }
   
 }

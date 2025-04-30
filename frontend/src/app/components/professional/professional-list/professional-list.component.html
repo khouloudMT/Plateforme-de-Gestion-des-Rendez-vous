@@ -24,6 +24,12 @@
       <p class="profession">{{ prof.profession }}</p>
       <p class="phone">{{ prof.phone }}</p>
     </div>
+
+    <button  *ngIf="userRole === 'client'" mat-raised-button color="primary" (click)="openBookingDialog(prof)">Book</button>
+    <div *ngIf="userRole === 'admin'" class="card-actions">
+      <button mat-raised-button color="primary" (click)="editProfessional(prof)">Edit</button>
+      <button mat-raised-button color="warn" (click)="deleteProfessional(prof)">Delete</button>
+    </div>
   </div>
 </div>
 

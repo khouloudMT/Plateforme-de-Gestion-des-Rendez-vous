@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AppointmentService } from '../../../services/appointment.service';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,20 +16,24 @@ import { AuthService } from '../../../services/auth.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-appointment-list',
   templateUrl: './appointment-list.component.html',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     CommonModule,
+
     MatTableModule,
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
     MatTabsModule,
     MatFormFieldModule,
+    MatPaginatorModule,
+
     AppointmentStatsComponent
 
   ],
@@ -44,10 +48,7 @@ export class AppointmentListComponent implements OnInit {
 
   displayedColumns: string[] = [];
 
-  fromDate: string = '';
-  toDate: string = '';
-  selectedStatus: string = '';
-  selectedTabIndex: number = 0; // Index de l'onglet sélectionné
+  filterForm: FormGroup;
 
   @Input() appointments: any[] = [];
   @Input() professionals: any[] = [];
@@ -56,20 +57,28 @@ export class AppointmentListComponent implements OnInit {
 
 
   // Pagination variables
-  pageSize: number = 5;
-  currentPage: number = 1;
-  totalPages: number = 1;
+  pageSize = 7; 
+  currentPage = 1;
+ 
   
   private notificationSubscription!: Subscription;
 
 
   constructor(
     private appointmentService: AppointmentService,
+    private fb: FormBuilder,
+    
     private dialog: MatDialog,
     private userService: UserService,
     private authService: AuthService,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.filterForm = this.fb.group({
+      fromDate: [''],
+      toDate: [''],
+      selectedStatus: ['']
+    });
+  }
 
  
 
@@ -96,7 +105,6 @@ export class AppointmentListComponent implements OnInit {
         this.appointments = res;
         this.allAppointments = res; // Stocker tous les rendez-vous pour le filtrage
 
-        this.totalPages = Math.ceil(this.professionals.length / this.pageSize);
         this.currentPage = 1;
         this.updatePagedAppointments();
       },
@@ -113,23 +121,16 @@ export class AppointmentListComponent implements OnInit {
   }
 
   //Pagination
-  // Pagination logic
+  handlePageEvent(e: PageEvent) {
+    this.currentPage = e.pageIndex + 1;
+    this.pageSize = e.pageSize;
+    this.updatePagedAppointments();
+  }
+  
   updatePagedAppointments() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedAppointments = this.professionals.slice(start, end);
-  }
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagedAppointments();
-    }
-  }
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagedAppointments();
-    }
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.pagedAppointments = this.appointments.slice(startIndex, endIndex);
   }
 
 
@@ -221,8 +222,9 @@ export class AppointmentListComponent implements OnInit {
    
   // Filter logic
   applyFilters() {
-    const from = this.fromDate || '0000-01-01';
-    const to = this.toDate || '9999-12-31';
+    const { fromDate, toDate, selectedStatus } = this.filterForm.value;
+    const from = fromDate || '0000-01-01';
+    const to = toDate || '9999-12-31';
 
     this.appointments = this.allAppointments.filter(appt => {
       const apptDate = new Date(appt.date);
@@ -231,36 +233,18 @@ export class AppointmentListComponent implements OnInit {
       return apptDateOnly >= from && apptDateOnly <= to;
     });
 
-    if (this.selectedStatus) {
+    if (selectedStatus) {
       this.appointments = this.appointments.filter(appt => 
-        appt.status?.toLowerCase() === this.selectedStatus.toLowerCase()
+        appt.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
 
-    this.totalPages = Math.ceil(this.professionals.length / this.pageSize);
+
     this.currentPage = 1;
     this.updatePagedAppointments();
   }
 
-  onTabChange(index: number): void {
-    this.selectedTabIndex = index;
-    this.filterAppointmentsByTab();
-  }
-
-  filterAppointmentsByTab() {
-    this.applyFilters();
-  }
-
-  getStatusFromTabIndex(index: number): string | null {
-    switch (index) {
-      case 1: return 'confirmed';
-      case 2: return 'cancelled';
-      case 3: return 'pending';
-      case 4: return 'completed';
-      default: return null;
-    }
-  }
 
   getStatusColor(status: string): string {
     switch (status) {

@@ -1,41 +1,14 @@
 <div class="client-dashboard-container">
   <!-- Side Navigation -->
-  <div class="side-nav">
-    <!-- <div class="profile-section"  *ngIf="currentUser">
-      <h2>Client</h2>
-      <p class="user-name">{{ currentUser?.name }}</p>
-      <p class="user-email">{{ currentUser?.email }}</p>
-    </div> -->
-
-    <nav>
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <a routerLink="/client" routerLinkActive="active">
-            <mat-icon>event</mat-icon>
-            My Appointments
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/client/calendar" routerLinkActive="active">
-            <mat-icon>calendar_today</mat-icon>
-            Calendar
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/client/professionals" routerLinkActive="active">
-            <mat-icon>people</mat-icon>
-            Professionals
-          </a>
-        </li>
-        
-      </ul>
-    </nav>
-
-  </div>
+  <app-sidebar
+        [navItems]="clientNavItems"
+        [isCollapsed]="sidebarCollapsed"
+        (toggle)="sidebarCollapsed = $event">
+      </app-sidebar>
   
 
   <!-- Main Content Area -->
-  <div class="main-content">
+  <div class="main-content" [class.collapsed]="sidebarCollapsed">
     <div class="client-dashboard">
       
       <router-outlet></router-outlet>

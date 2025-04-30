@@ -1,32 +1,11 @@
 <div class="professional-dashboard-container">
   <!-- Side Navigation -->
-  <div class="side-nav">
-    <!-- <div class="profile-section"  *ngIf="currentUser">
-      <h2>Client</h2>
-      <p class="user-name">{{ currentUser?.name }}</p>
-      <p class="user-email">{{ currentUser?.email }}</p>
-    </div> -->
-
-    <nav>
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <a routerLink="/Professional" routerLinkActive="active">
-            <mat-icon>event</mat-icon>
-            My Appointments
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/professional/calendar" routerLinkActive="active">
-            <mat-icon>calendar_today</mat-icon>
-            Calendar
-          </a>
-        </li>        
-      </ul>
-    </nav>
-
-  </div>
+  <app-sidebar 
+    [navItems]="professionalNavItems"
+    [isCollapsed]="sidebarCollapsed"
+    (toggle)="sidebarCollapsed = $event">
+  </app-sidebar>
   
-
   <!-- Main Content Area -->
   <div class="main-content">
     <div class="professional-dashboard">

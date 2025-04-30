@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { AppointmentService } from '../../../services/appointment.service';
 import { RouterModule } from '@angular/router';
+import { SidebarComponent } from "../../layout/sidebar/sidebar.component";
+
 
 @Component({
   selector: 'app-professional-dashboard',
@@ -15,20 +17,33 @@ import { RouterModule } from '@angular/router';
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    RouterModule
-  ],
+    RouterModule,
+    SidebarComponent
+],
   templateUrl: './professional-dashboard.component.html',
   styleUrl: './professional-dashboard.component.scss'
 })
 export class ProfessionalDashboardComponent {
   appointments: any[] = [];
-  displayedColumns: string[] = ['client','phone', 'date', 'time', 'status', 'actions'];
+  displayedColumns: string[] = ['client', 'date', 'time', 'status', 'actions'];
+
+  // for sidebar
+  sidebarCollapsed = false;
+  professionalNavItems = [
+    { label: 'My Schedule', icon: 'event', link: '/professional' },
+    { label: 'Appointments', icon: 'list_alt', link: '/professional/appointments' },
+    { label: 'Clients', icon: 'people', link: '/professional/clients' }
+  ];
 
   constructor(
-    private appointmentService: AppointmentService) 
+    private appointmentService: AppointmentService,
+
+  ) 
     {
     this.loadAppointments();
   }
+
+ 
 
   loadAppointments() {
     this.appointmentService.getProfessionalAppointments().subscribe(appointments => {

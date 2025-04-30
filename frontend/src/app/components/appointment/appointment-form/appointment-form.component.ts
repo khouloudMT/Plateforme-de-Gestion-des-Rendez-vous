@@ -38,7 +38,7 @@ export class AppointmentFormComponent {
     private snackBar: MatSnackBar
   ) {
     this.appointmentForm = this.fb.group({
-      professional: ['', Validators.required],
+      professional: [data.selectedProfessionalId ||'', Validators.required],
       date: ['', Validators.required],
       time: ['', Validators.required],
       notes: ['']
