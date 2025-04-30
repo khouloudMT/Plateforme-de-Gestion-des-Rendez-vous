@@ -15,7 +15,10 @@ export class AppointmentService {
     private webSocketService:  WebsocketService
   ) { }
 
-  
+  getMyAppointments(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
+  }  
+
   getClientAppointments() {
     return this.http.get<any[]>(`http://localhost:5000/api/appointments/my-appointments`);
   }

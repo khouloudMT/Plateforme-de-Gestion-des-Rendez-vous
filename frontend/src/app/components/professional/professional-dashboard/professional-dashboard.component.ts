@@ -27,13 +27,12 @@ export class ProfessionalDashboardComponent {
   appointments: any[] = [];
   displayedColumns: string[] = ['client', 'date', 'time', 'status', 'actions'];
 
-  // for sidebar
-  sidebarCollapsed = false;
-  professionalNavItems = [
-    { label: 'My Schedule', icon: 'event', link: '/professional' },
-    { label: 'Appointments', icon: 'list_alt', link: '/professional/appointments' },
-    { label: 'Clients', icon: 'people', link: '/professional/clients' }
-  ];
+// for sidebar
+sidebarCollapsed = false;
+professionalNavItems = [
+  { label: 'Appointments', icon: 'list_alt', link: '/professional/appointments' },
+  { label: 'Calendar', icon: 'event', link: '/professional/calendar' },
+];
 
   constructor(
     private appointmentService: AppointmentService,
