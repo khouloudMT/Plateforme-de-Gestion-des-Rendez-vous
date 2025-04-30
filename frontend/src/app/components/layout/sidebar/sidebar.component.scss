@@ -3,7 +3,7 @@
   color: white;
   width: 240px;
   transition: width 0.3s ease;
-  height: 100vh;
+  height: 100%;
 
   &.collapsed {
     width: 80px;
@@ -66,7 +66,7 @@
           padding: 12px 20px;
           color: white;
           text-decoration: none;
-          transition: background 0.2s ease;
+          transition: background-color 0.2s ease;
 
           &:hover,
           &.active {
@@ -81,3 +81,4 @@
     }
   }
 }
+  

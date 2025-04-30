@@ -43,6 +43,31 @@
   margin-top: 0.25rem;
 }
 
+.card button[mat-raised-button] {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.2);
+}
+
+.card button[mat-raised-button]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(63, 81, 181, 0.3);
+}
+
+.card button[mat-raised-button]:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(63, 81, 181, 0.2);
+}
+
+
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -50,25 +75,6 @@
   gap: 1rem;
   margin: 1.5rem 0;
 }
-
-.professional-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  .professional-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    background: white;
-    text-align: center;
-    width: 300px;
-  }
-}
-
 .profession-filters {
   display: flex;
   gap: 10px;
@@ -93,4 +99,26 @@
       background-color: #d1d5db;
     }
   }
+ 
+  
 }
+
+.professional-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .professional-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: white;
+    text-align: center;
+    width: 300px;
+  }
+}
+
+
