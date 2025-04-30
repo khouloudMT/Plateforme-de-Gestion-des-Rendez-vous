@@ -106,7 +106,7 @@ router.get('/',
     }
 });
 
-// @route   GET api/appointments/me
+// @route   GET api/appointments/my-appointments'
 // @desc    Get current user's appointments
 // @access  Private Client/Professional
 router.get('/my-appointments', 
