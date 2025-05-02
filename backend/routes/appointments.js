@@ -315,6 +315,7 @@ router.delete('/:id', protect,
     }
 });
 
+// Get available time slots for a professional on a given date
 
 
 module.exports = router;
