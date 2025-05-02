@@ -57,3 +57,13 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+
+// Update status
+const cron = require('node-cron');
+const updateAppointmentStatuses = require('./utils/updateStatus');
+// cron job chaque 10 minutes
+cron.schedule('*/30 * * * *', async () => {
+    console.log('[CRON] Updating appointment statuses...');
+    await updateAppointmentStatuses();
+  });

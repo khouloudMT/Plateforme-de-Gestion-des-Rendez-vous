@@ -30,9 +30,8 @@ export class ProfessionalDashboardComponent {
   // for sidebar
   sidebarCollapsed = false;
   professionalNavItems = [
-    { label: 'My Schedule', icon: 'event', link: '/professional' },
     { label: 'Appointments', icon: 'list_alt', link: '/professional/appointments' },
-    { label: 'Clients', icon: 'people', link: '/professional/clients' }
+    { label: 'Calendar', icon: 'event', link: '/professional/calendar' },
   ];
 
   constructor(

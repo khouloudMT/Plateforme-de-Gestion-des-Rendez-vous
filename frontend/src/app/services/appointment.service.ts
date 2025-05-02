@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { WebsocketService} from './websocket.service'; // Adjust the path as needed
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,9 +42,22 @@ export class AppointmentService {
     return this.http.get(`http://localhost:5000/api/appointments/${appointmentId}`);
   }
 
+  
+  
+  
   // Notification stream
   getNotifications() {
     return this.webSocketService.getNotifications();
+  }
+
+   // Schedule deletion in 48 hours
+   private scheduleDeletion(appointment: any) {
+    const delay = 48 * 60 * 60 * 1000; // 48h in ms
+    const timer$ = timer(delay);
+    
+    this.pendingDeletion[appointment._id] = timer$.subscribe(() => {
+      this.deleteAppointment(appointment._id).subscribe();
+    });
   }
 
   // Called when client cancels
@@ -80,15 +95,7 @@ export class AppointmentService {
     return this.updateAppointment(appointment._id, { status });
   }
 
-  // Schedule deletion in 48 hours
-  private scheduleDeletion(appointment: any) {
-    const delay = 48 * 60 * 60 * 1000; // 48h in ms
-    const timer$ = timer(delay);
-    
-    this.pendingDeletion[appointment._id] = timer$.subscribe(() => {
-      this.deleteAppointment(appointment._id).subscribe();
-    });
-  }
+
 
   // Auto-mark as completed after 1h, then delete after 48h
   private scheduleAutoCompleteAndDeletion(appointment: any) {

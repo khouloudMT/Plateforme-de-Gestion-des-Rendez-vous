@@ -122,7 +122,7 @@ router.get('/my-appointments',
                 .sort({ date: 1 });
         } else if (req.user.role === 'professional') {
             appointments = await Appointment.find({ professional: req.user.id })
-                .populate('client', 'name email')
+                .populate('client', 'name email phone')
                 .sort({ date: 1 });
         } else {
             return res.status(401).json({ msg: 'Not authorized' });
@@ -135,8 +135,6 @@ router.get('/my-appointments',
         res.status(500).send('Server Error');
     }
 });
-
-
 
 // @route   GET api/appointments/:id
 // @desc    Get appointment by ID

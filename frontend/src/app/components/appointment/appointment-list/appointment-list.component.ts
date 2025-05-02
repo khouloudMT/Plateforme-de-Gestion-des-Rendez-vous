@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AppointmentService } from '../../../services/appointment.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,9 +15,9 @@ import { AppointmentStatsComponent } from '../appointment-stats/appointment-stat
 import { AuthService } from '../../../services/auth.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-appointment-list',
@@ -33,6 +33,7 @@ import { Subscription } from 'rxjs';
     MatTabsModule,
     MatFormFieldModule,
     MatPaginatorModule,
+  
 
     AppointmentStatsComponent
 
@@ -48,7 +49,11 @@ export class AppointmentListComponent implements OnInit {
 
   displayedColumns: string[] = [];
 
-  filterForm: FormGroup;
+  filterForm = new FormGroup({
+    fromDate: new FormControl(''),
+    toDate: new FormControl(''),
+    selectedStatus: new FormControl('')
+  });
 
   @Input() appointments: any[] = [];
   @Input() professionals: any[] = [];
@@ -71,7 +76,6 @@ export class AppointmentListComponent implements OnInit {
     private dialog: MatDialog,
     private userService: UserService,
     private authService: AuthService,
-    private snackBar: MatSnackBar
   ) {
     this.filterForm = this.fb.group({
       fromDate: [''],
@@ -87,7 +91,6 @@ export class AppointmentListComponent implements OnInit {
     this.loadAppointments();
     this.loadProfessionals();
     this.setDisplayedColumns();
-    this.subscribeToNotifications();
     // this.loadRandomProfessionals();
   }
 
@@ -201,24 +204,6 @@ export class AppointmentListComponent implements OnInit {
   }
 
 
-  // Notification logic
-  private subscribeToNotifications() {
-    this.notificationSubscription = this.appointmentService.getNotifications()
-      .subscribe(notification => {
-        this.snackBar.open(notification.message, 'Close', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-        this.loadAppointments(); // Refresh the list
-      });
-  }
-
-  ngOnDestroy(): void {
-    if (this.notificationSubscription) {
-      this.notificationSubscription.unsubscribe();
-    }
-  }
    
   // Filter logic
   applyFilters() {
@@ -234,25 +219,14 @@ export class AppointmentListComponent implements OnInit {
     });
 
     if (selectedStatus) {
-      this.appointments = this.appointments.filter(appt => 
-        appt.status?.toLowerCase() === selectedStatus.toLowerCase()
-      );
+      console.log('Selected status:', selectedStatus);
+      this.appointments = this.appointments.filter(appt => {
+        console.log('Appointment status:', appt.status);
+        return appt.status?.toLowerCase() === selectedStatus.toLowerCase();
+      });
     }
-
-
-
     this.currentPage = 1;
     this.updatePagedAppointments();
   }
 
-
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'confirmed': return 'primary';
-      case 'pending': return 'accent';
-      case 'cancelled': return 'warn';
-      case 'completed': return 'green';
-      default: return '';
-    }
-  }
 }

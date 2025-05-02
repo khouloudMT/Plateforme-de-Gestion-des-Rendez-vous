@@ -109,25 +109,32 @@
   }
 
   .status-chip {
-    padding: 4px 12px;
-    border-radius: 16px;
-    color: white;
-    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
     display: inline-block;
-    text-align: center;
-    min-width: 80px;
+    text-transform: capitalize;
 
     &.confirmed {
-      background-color: #4caf50;
+      background-color: #e0f2fe;
+      color: #0369a1;
     }
     &.pending {
-      background-color: #ff9800;
-    }
-    &.cancelled {
-      background-color: #f44336;
+      background-color: #fef3c7;
+      color: #b45309;
     }
     &.completed {
-      background-color: #2196f3;
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    &.cancelled {
+      background-color: #f3f4f6;
+      color: #4b5563;
+    }
+    &.expired {
+      background-color: #fee2e2;
+      color: #991b1b;
     }
   }
 
