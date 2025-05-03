@@ -6,6 +6,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { InitialsPipe } from "../../../pipes/initials.pipe";
 import { AuthService } from '../../../services/auth.service';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserService } from '../../../services/user.service';
 
 interface NavItem {
   label: string;
@@ -23,7 +25,7 @@ interface NavItem {
     MatIconModule, 
     MatTooltipModule,
     MatButtonModule, 
-    InitialsPipe],
+  ],
 
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
@@ -33,25 +35,22 @@ export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   @Output() toggle = new EventEmitter<boolean>();
 
-  currentRoute: string = '';
-
-  get userName(): string {
-    const user = this.authService.currentUserValue;
-    return user?.name || user?.email?.split('@')[0] || 'User';
-  }
-  get userEmail(): string | null {
-    return this.authService.currentUserValue?.email || null;
-  }
+  currentUser: any = null;
+  user: any ;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+
   ) {}
 
-  ngOnInit() {
-    this.currentRoute = this.router.url;
-    this.router.events.subscribe(() => {
-      this.currentRoute = this.router.url;
+  ngOnInit(): void {
+    this.authService.getCurrentUser().subscribe({
+      next: (data) => {
+        this.user = data;
+      },
+      error: (err) => {
+        console.error('Failed to fetch user', err);
+      }
     });
   }
 
