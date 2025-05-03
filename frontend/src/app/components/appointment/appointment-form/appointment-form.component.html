@@ -5,7 +5,7 @@
       <mat-label>Professional</mat-label>
       <mat-select formControlName="professional">
         <mat-option *ngFor="let professional of data.professionals" [value]="professional._id">
-          {{professional.name}} ({{professional.profession}})
+          {{ professional.name }} ({{ professional.profession }})
         </mat-option>
       </mat-select>
       <mat-error *ngIf="appointmentForm.get('professional')?.hasError('required')">
@@ -23,17 +23,32 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="time-fields">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Time</mat-label>
-        <mat-select formControlName="time">
-          <mat-option *ngFor="let time of timeSlots" [value]="time">{{time}}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="appointmentForm.get('time')?.hasError('required')">
-          Time is required
-        </mat-error>
-      </mat-form-field>
+    <div class="time-grid">
+      <div
+        class="time-slot"
+        *ngFor="let slot of allTimeSlots"
+        [class.booked]="bookedSlots.includes(slot)"
+        [class.selected]="appointmentForm.get('time')?.value === slot"
+        [attr.title]="bookedSlots.includes(slot) ? 'Slot already booked' : ''"
+        (click)="selectSlot(slot)"
+        [ngClass]="{
+          disabled: bookedSlots.includes(slot)
+        }"
+      >
+        {{ slot }}
+      </div>
     </div>
+    <mat-card *ngIf="dayBlocked" color="warn" class="warning-card">
+      <mat-card-content>
+        <mat-icon color="warn">warning</mat-icon>
+        You already have an appointment with this professional on this day.
+      </mat-card-content>
+    </mat-card>
+    
+    
+    <mat-error *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched">
+      Time is required
+    </mat-error>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Notes</mat-label>
@@ -41,7 +56,10 @@
     </mat-form-field>
   </form>
 </mat-dialog-content>
-<mat-dialog-actions align="end">
+
+<mat-dialog-actions class="actions-end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="appointmentForm.invalid">Save</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="appointmentForm.invalid">
+    Save
+  </button>
 </mat-dialog-actions>

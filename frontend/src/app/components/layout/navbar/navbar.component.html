@@ -4,7 +4,7 @@
     <span class="spacer"></span>
 
     <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-btn">
-      <mat-icon [matBadge]="notifications.length" [matBadgeHidden]="!notifications.length">
+      <mat-icon aria-label="Close" [matBadge]="notifications.length" [matBadgeHidden]="!notifications.length">
         notifications
       </mat-icon>
     </button>

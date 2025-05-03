@@ -1,31 +1,54 @@
-.actions-end {
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .full-width {
-    width: 100%;
-    margin-bottom: 16px;
-  }
-  
-  .actions {
-    padding: 16px 0;
-    button {
-      margin-left: 8px;
-    }
-  }
-  
-  .booked-indicator {
-    color: #f44336;
-    font-size: 0.8em;
-    margin-left: 8px;
-  }
-  
-  .warning-hint {
-    color: #ff9800;
-  }
-  
-  mat-spinner {
-    display: inline-block;
-    margin: 0 8px;
-  }
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.time-slot {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #e0f7fa;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.time-slot:hover {
+  background-color: #b2ebf2;
+}
+
+.time-slot.booked {
+  background-color: #f1f1f1;
+  color: #999;
+  cursor: not-allowed;
+  border: 1px solid #ccc;
+  text-decoration: line-through;
+}
+
+.time-slot.selected {
+  background-color: #0288d1;
+  color: white;
+  font-weight: bold;
+}
+
+.time-slot.disabled {
+  pointer-events: none;
+}
+
+.warning {
+  color: #d32f2f;
+  background: #ffe5e5;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+.mat-option.disabled-slot {
+  color: gray !important;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+

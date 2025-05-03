@@ -69,4 +69,15 @@ export class AuthService {
     return user ? user.role : null;
   }
 
+  getCurrentUser(): any | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      return jwtDecode(token);
+    } catch (e) {
+      console.error('Invalid token:', e);
+      return null;
+    }
+  }
 }

@@ -1,6 +1,15 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, timer } from 'rxjs';
+import { catchError, Observable, throwError, timer } from 'rxjs';
+
+interface AvailabilityResponse {
+  success: boolean;
+  availableSlots: string[];
+  clientHasAppointments: boolean;
+  conflictingAppointments: any[];
+  message?: string;
+  error?: string;
+}
 import { WebsocketService} from './websocket.service'; // Adjust the path as needed
 
 
@@ -42,8 +51,9 @@ export class AppointmentService {
     return this.http.get(`http://localhost:5000/api/appointments/${appointmentId}`);
   }
 
-  
-  
+  getAvailableSlots(professionalId: string, date: string): Observable<any> {
+    return this.http.get(`http://localhost:5000/api/appointments/available-slots/${professionalId}/${date}`);
+  }
   
   // Notification stream
   getNotifications() {
