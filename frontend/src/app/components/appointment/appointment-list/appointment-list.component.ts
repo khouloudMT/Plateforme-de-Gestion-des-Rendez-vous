@@ -114,6 +114,17 @@ export class AppointmentListComponent implements OnInit {
         console.error("Erreur chargement appointments", err);
       }
     });
+    if (this.userRole === 'admin') {
+      this.appointmentService.getAdminAppointments().subscribe(
+        {next: (res: any[]) => {
+        this.appointments = res;
+        this.allAppointments = res;
+        this.updatePagedAppointments();
+      },
+      error: err => console.error("Error loading appointments", err)
+    });
+    }
+    
   }
 
   loadProfessionals() {
@@ -122,14 +133,7 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
-  loadAdminAppointments() {
-    if (this.userRole === 'admin') {
-      this.appointmentService.getAdminAppointments().subscribe(appointments => {
-        this.appointments = appointments;
-      });
-    }
-  }
-
+ 
   //Pagination
   handlePageEvent(e: PageEvent) {
     this.currentPage = e.pageIndex + 1;
