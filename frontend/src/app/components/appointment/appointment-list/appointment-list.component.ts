@@ -96,7 +96,9 @@ export class AppointmentListComponent implements OnInit {
       this.displayedColumns = ['date', 'time', 'professional', 'profession', 'status', 'edit', 'cancel'];
     } else if (this.userRole === 'professional') {
       this.displayedColumns = ['date', 'time', 'client', 'phone', 'email', 'status', 'edit', 'cancel'];
-    }
+    }   else if (this.userRole === 'admin') {
+      this.displayedColumns = ['date', 'time', 'client', 'professional', 'profession', 'status', 'actions'];
+    } 
   }
 
   loadAppointments() {
@@ -118,6 +120,14 @@ export class AppointmentListComponent implements OnInit {
     this.userService.getProfessionals().subscribe(professionals => {
       this.professionals = professionals;
     });
+  }
+
+  loadAdminAppointments() {
+    if (this.userRole === 'admin') {
+      this.appointmentService.getAdminAppointments().subscribe(appointments => {
+        this.appointments = appointments;
+      });
+    }
   }
 
   //Pagination
@@ -254,5 +264,26 @@ export class AppointmentListComponent implements OnInit {
       case 'completed': return 'green';
       default: return '';
     }
+  }
+
+  adminCancel(appointment: any): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '350px',
+      data: { message: 'Are you sure you want to cancel this appointment as admin?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.appointmentService.adminCancelAppointment(appointment._id).subscribe({
+          next: () => {
+            this.snackBar.open('Appointment cancelled successfully', 'Close', { duration: 3000 });
+            this.loadAppointments();
+          },
+          error: (err) => {
+            this.snackBar.open('Failed to cancel appointment', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

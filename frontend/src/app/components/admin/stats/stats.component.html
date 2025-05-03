@@ -1,0 +1,64 @@
+<div class="stats-container">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+  
+    <div *ngIf="!isLoading" class="stats-grid">
+      <!-- Row 1: Registration and Role Charts -->
+      <div class="chart-card">
+        <h2>User Registration Trends</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="regChartData"
+            [options]="regChartOptions"
+            [type]="regChartType">
+          </canvas>
+        </div>
+      </div>
+  
+      <div class="chart-card">
+        <h2>User Role Distribution</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="roleChartData"
+            [options]="roleChartOptions"
+            [type]="roleChartType">
+          </canvas>
+        </div>
+      </div>
+  
+      <!-- Row 2: Status Chart and Key Metrics -->
+      <div class="chart-card">
+        <h2>Appointment Status</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="statusChartData"
+            [options]="statusChartOptions"
+            [type]="statusChartType">
+          </canvas>
+        </div>
+      </div>
+  
+      <div class="metrics-card">
+        <h2>Key Metrics</h2>
+        <div class="metrics-grid">
+          <div class="metric">
+            <div class="metric-value">{{monthlyStats.totalUsers || 0}}</div>
+            <div class="metric-label">Total Users</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">{{monthlyStats.totalAppointments || 0}}</div>
+            <div class="metric-label">Total Appointments</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">{{monthlyStats.newUsers || 0}}</div>
+            <div class="metric-label">New Users (30 days)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">{{monthlyStats.completedAppointments || 0}}</div>
+            <div class="metric-label">Completed Appointments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

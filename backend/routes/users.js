@@ -3,6 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
+const moment = require('moment');
 
 // @route   GET api/users
 // @desc    Get all users
@@ -124,7 +125,7 @@ router.delete('/:id',
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        await user.remove();
+        await user.deleteOne();
 
         res.json({ msg: 'User removed' });
     } catch (err) {
@@ -135,5 +136,98 @@ router.delete('/:id',
         res.status(500).send('Server Error');
     }
 });
+
+// @route   GET api/users/stats/registrations
+// @desc    Get user registration statistics
+// @access  Private/Admin
+router.get('/stats/registrations', 
+    protect,
+    authorize('admin'),
+    async (req, res) => {
+    try {
+        // Get registration counts for last 30 days
+        const registrationStats = await User.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: new Date(new Date().setDate(new Date().getDate() - 30))
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ]);
+
+        // Format the response
+        const dates = [];
+        const counts = [];
+        
+        // Fill in missing dates with 0 counts
+        const startDate = moment().subtract(30, 'days');
+        const endDate = moment();
+        
+        for (let m = moment(startDate); m.diff(endDate) <= 0; m.add(1, 'days')) {
+            const dateStr = m.format('YYYY-MM-DD');
+            const stat = registrationStats.find(s => s._id === dateStr);
+            
+            dates.push(dateStr);
+            counts.push(stat ? stat.count : 0);
+        }
+
+        res.json({
+            dates,
+            counts
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/users/stats/roles
+// @desc    Get user role distribution statistics
+// @access  Private/Admin
+router.get('/stats/roles',
+    protect,
+    authorize('admin'),
+    async (req, res) => {
+    try {
+        const roleStats = await User.aggregate([
+            {
+                $group: {
+                    _id: "$role",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Format the response
+        const roles = [];
+        const counts = [];
+        
+        roleStats.forEach(stat => {
+            roles.push(stat._id);
+            counts.push(stat.count);
+        });
+
+        res.json({
+            roles,
+            counts
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 module.exports = router;

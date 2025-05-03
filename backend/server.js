@@ -34,6 +34,8 @@ const auth = require('./routes/auth');
 const users = require('./routes/users');
 const appointments = require('./routes/appointments');
 const professionals = require('./routes/professionals'); 
+const statsRoutes = require('./routes/stats');
+
 
 // Debugging: Verify routes loaded
 console.log('Routes required:', { auth, users, appointments, professionals });
@@ -43,6 +45,7 @@ app.use('/api/auth', auth);
 app.use('/api/users', users);
 app.use('/api/appointments', appointments);
 app.use('/api/professionals', professionals);
+app.use('/api/stats', statsRoutes);
 
 
 // Serve static assets if in production
