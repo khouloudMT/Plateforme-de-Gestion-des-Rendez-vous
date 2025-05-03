@@ -29,8 +29,8 @@ import { Subscription } from 'rxjs';
 })
 export class NavbarComponent {
   currentUser: any;
-  notifications: any[] = [];
-  private notificationSubscription: Subscription;
+  // notifications: any[] = [];
+  // private notificationSubscription: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -38,21 +38,21 @@ export class NavbarComponent {
     private appointmentService: AppointmentService
   ) {
     this.currentUser = this.authService.currentUserValue;
-    this.notificationSubscription = this.appointmentService.getNotifications()
-      .subscribe((notification: any) => {
-        this.notifications.unshift(notification);
-      });
+    // this.notificationSubscription = this.appointmentService.getNotifications()
+    //   .subscribe((notification: any) => {
+    //     this.notifications.unshift(notification);
+    //   });
   }
 
   // Notificatipns
-  ngOnDestroy() {
-    if (this.notificationSubscription) {
-      this.notificationSubscription.unsubscribe();
-    }
-  }
-  clearNotifications() {
-    this.notifications = [];
-  }
+  // ngOnDestroy() {
+  //   if (this.notificationSubscription) {
+  //     this.notificationSubscription.unsubscribe();
+  //   }
+  // }
+  // clearNotifications() {
+  //   this.notifications = [];
+  // }
 
   getDashboardRoute(): string {
     const role = this.authService.getUserRole();

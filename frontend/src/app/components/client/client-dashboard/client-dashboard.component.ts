@@ -35,7 +35,7 @@ export class ClientDashboardComponent {
   currentUser = { name: 'John Doe', email: 'john@example.com' };
   
   clientNavItems = [
-    { label: 'My Appointments', icon: 'event', link: '/client' },
+    { label: 'My Appointments', icon: 'list_alt', link: '/client/appointments' },
     { label: 'Calendar', icon: 'calendar_today', link: '/client/calendar' },
     { label: 'Professionals', icon: 'people', link: '/client/professionals' }
   ];

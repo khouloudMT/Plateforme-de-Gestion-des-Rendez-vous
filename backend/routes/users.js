@@ -30,7 +30,7 @@ router.get('/',
 // @access  Private
 router.get('/professionals',
     protect,
-    authorize('admin','client'), // Ensure only admin can access this route
+     // Ensure only admin can access this route
      async (req, res) => {
     try {
         const professionals = await User.find({ role: 'professional' }).select('-password');
@@ -135,5 +135,27 @@ router.delete('/:id',
         res.status(500).send('Server Error');
     }
 });
+
+
+// GET /api/users/:id — Get full user info by ID
+router.get('/:id', async (req, res) => {
+    try {
+      const userId = req.params.id;
+  
+      const user = await User.findById(userId).select('-password'); // exclude password
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json(user);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+ 
+
+
 
 module.exports = router;

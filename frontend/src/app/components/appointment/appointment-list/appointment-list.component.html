@@ -6,33 +6,39 @@
   <div class="content-wrapper">
     <!-- Header Actions -->
     <div class="header-actions">
-      <div class="filters">
-        <div class="date-filters">
-          <input 
-            type="date" 
-            formControlName="fromDate" 
-            class="date-input"
-            placeholder="From Date"
-          >
-          <input 
-            type="date" 
-            formControlName="toDate" 
-            class="date-input"
-            placeholder="To Date"
-          >
+      <form [formGroup]="filterForm">
+        <div class="filters">
+          <div class="date-filters">
+            <input 
+              type="date" 
+              formControlName="fromDate" 
+              class="date-input"
+              placeholder="From Date"
+            >
+            <input 
+              type="date" 
+              formControlName="toDate" 
+              class="date-input"
+              placeholder="To Date"
+            >
+          </div>
+      
+          <select formControlName="selectedStatus" class="status-select">
+            <option value="">All Status</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="expired">Expired</option>
+          </select>
+      
+          <button class="filter-btn" (click)="applyFilters()">
+            <mat-icon>filter_list</mat-icon>
+            Filter
+          </button>
         </div>
-        <select formControlName="selectedStatus" class="status-select">
-          <option value="">All Status</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
-        </select>
-        <button class="filter-btn" (click)="applyFilters()">
-          <mat-icon>filter_list</mat-icon>
-          Filter
-        </button>
-      </div>
+      </form>
+      
       
       <div *ngIf="userRole === 'client'" class="new-appointment">
         <button mat-raised-button color="primary" (click)="openAppointmentForm()">
@@ -60,9 +66,9 @@
           <tr *ngFor="let appt of pagedAppointments">
             <td>{{appt.date | date:'mediumDate'}}</td>
             <td>{{appt.time}}</td>
-            <td *ngIf="userRole === 'client'">{{appt.professional.name}}</td>
-            <td *ngIf="userRole === 'client'">{{appt.professional.profession}}</td>
-            <td *ngIf="userRole === 'professional'">{{appt.client.name}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.name | initials}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.profession }}</td>
+            <td *ngIf="userRole === 'professional'">{{appt.client.name | initials}}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.email}}</td>
             <td>
               <span class="status-chip" [ngClass]="appt.status.toLowerCase()">
@@ -80,7 +86,7 @@
                 </button>
                 <button mat-icon-button color="warn"
                         (click)="cancelAppointment(appt)"
-                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed'"
+                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed'|| appt.status === 'expired'"
                         matTooltip="Cancel">
                   <mat-icon>close</mat-icon>
                 </button>
@@ -96,7 +102,7 @@
                 </button>
                 <button mat-icon-button color="warn"
                         (click)="cancelAppointment(appt)"
-                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed'"
+                        [disabled]="appt.status === 'cancelled' || appt.status === 'completed' || appt.status === 'expired'"
                         matTooltip="Cancel">
                   <mat-icon>cancel</mat-icon>
                 </button>
