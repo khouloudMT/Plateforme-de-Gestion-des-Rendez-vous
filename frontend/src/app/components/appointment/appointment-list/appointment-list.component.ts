@@ -17,6 +17,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
+import { InitialsPipe } from "../../../pipes/initials.pipe";
 
 
 @Component({
@@ -25,7 +26,6 @@ import { Subscription } from 'rxjs';
   imports: [
     ReactiveFormsModule,
     CommonModule,
-
     MatTableModule,
     MatIconModule,
     MatButtonModule,
@@ -33,11 +33,9 @@ import { Subscription } from 'rxjs';
     MatTabsModule,
     MatFormFieldModule,
     MatPaginatorModule,
-  
-
-    AppointmentStatsComponent
-
-  ],
+    AppointmentStatsComponent,
+    InitialsPipe
+],
 
   styleUrls: ['./appointment-list.component.scss']
 })
@@ -83,6 +81,16 @@ export class AppointmentListComponent implements OnInit {
       selectedStatus: ['']
     });
   }
+
+  // Method to update an appointment's status
+    // This method is called when the professional confirms or cancels an appointment
+  updateAppointment(appointmentId: string, updateData: any) {
+      return this.appointmentService.updateAppointment(appointmentId, updateData);
+    }
+
+  deleteAppointment(appointmentId: string) {
+      return this.appointmentService.deleteAppointment(appointmentId);
+    }
 
  
 
@@ -184,6 +192,15 @@ export class AppointmentListComponent implements OnInit {
       }
     });
   }
+
+  
+     // Called when professional cancels or confirms
+     professionalUpdatesStatus(appointment: any, professional: any, client: any, status: 'cancelled' | 'confirmed') {
+      appointment.status = status;
+
+      const actionMsg = status === 'cancelled' ? 'is cancelled' : 'is confirmed';
+      return this.updateAppointment(appointment._id, { status });
+    }
   
   confirmAppointment(appointment: any) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -203,6 +220,10 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
+   
+     
+   
+   
 
    
   // Filter logic

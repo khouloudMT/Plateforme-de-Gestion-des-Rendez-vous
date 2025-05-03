@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError, timer } from 'rxjs';
+import {Observable, timer } from 'rxjs';
 
 interface AvailabilityResponse {
   success: boolean;
@@ -10,9 +10,6 @@ interface AvailabilityResponse {
   message?: string;
   error?: string;
 }
-import { WebsocketService} from './websocket.service'; // Adjust the path as needed
-
-
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +20,6 @@ export class AppointmentService {
     private pendingDeletion: { [id: string]: any } = {};
 
     constructor(private http: HttpClient,
-    private webSocketService:  WebsocketService
   ) { }
 
   
@@ -55,11 +51,14 @@ export class AppointmentService {
     return this.http.get(`http://localhost:5000/api/appointments/available-slots/${professionalId}/${date}`);
   }
   
-  // Notification stream
-  getNotifications() {
-    return this.webSocketService.getNotifications();
-  }
 
+
+
+
+
+
+
+  
    // Schedule deletion in 48 hours
    private scheduleDeletion(appointment: any) {
     const delay = 48 * 60 * 60 * 1000; // 48h in ms
@@ -74,11 +73,6 @@ export class AppointmentService {
   clientCancels(appointment: any, client: any, professional: any) {
     appointment.status = 'cancelled';
     
-    this.webSocketService.sendNotification({
-      type: 'cancellation',
-      recipient: professional._id,
-      message: `The client "${client.name}" coming at "${appointment.time}" has cancelled their appointment.`
-    });
 
     this.scheduleDeletion(appointment);
     return this.updateAppointment(appointment._id, { status: 'cancelled' });
@@ -89,12 +83,7 @@ export class AppointmentService {
     appointment.status = status;
 
     const actionMsg = status === 'cancelled' ? 'is cancelled' : 'is confirmed';
-    
-    this.webSocketService.sendNotification({
-      type: status,
-      recipient: client._id,
-      message: `Your "${professional.profession}" appointment taken at "${appointment.time}" ${actionMsg}.`
-    });
+
 
     if (status === 'cancelled') {
       this.scheduleDeletion(appointment);

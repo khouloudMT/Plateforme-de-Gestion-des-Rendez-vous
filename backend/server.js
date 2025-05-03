@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const setupSwagger = require('./swagger'); 
+
+// const socketIo = require('socket.io');
 
 const app = express();
 
@@ -26,8 +27,33 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/rendezvou
 // Debugging: Verify routes are loading
 console.log('Before requiring routes');
 
-// Setup Swagger
-setupSwagger(app); 
+// Socket.io setup
+// const server = http.createServer(app);
+// const io = socketIo(server, {
+//   cors: {
+//     origin: '*',
+//     methods: ['GET', 'POST']
+//   }
+// });
+// app.use((req, res, next) => {
+//     req.io = io;
+//     next();
+//   });
+  
+// gestion des connexions
+// io.on('connection', (socket) => {
+// console.log('Socket connected:', socket.id);
+
+// // on peut écouter un event d'authentification ici
+// socket.on('joinRoom', (userId) => {
+//     socket.join(userId); // join une "room" personnelle basée sur l'id du client
+// });
+
+// socket.on('disconnect', () => {
+//     console.log('Socket disconnected');
+// });
+// });
+
 
 // Route files
 const auth = require('./routes/auth');

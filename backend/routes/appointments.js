@@ -40,12 +40,24 @@ router.post('/', [
             return res.status(400).json({
             msg: 'You already have an appointment with this professional on this day.'
             });
-        } 
+        }
     
         // Prevent double-booking same time slot
         const conflict = await Appointment.findOne({ professional, date, time });
         if (conflict) {
             return res.status(400).json({ msg: 'This time slot is already booked with the selected professional.' });
+        }
+
+        // Prevent client from booking multiple appointments at same time, even with different pros
+        const clientConflict = await Appointment.findOne({
+            client: req.user.id,
+            date,
+            time
+        });
+        if (clientConflict) {
+            return res.status(400).json({
+            msg: 'You already have an appointment at this time.'
+            });
         }
     
         const appointment = new Appointment({
@@ -234,6 +246,19 @@ router.put('/:id',
 
         await appointment.save();
 
+         // Notify the client via socket
+        req.io.to(appointment.client.toString()).emit('appointmentStatusChanged', {
+            appointmentId: appointment._id,
+            newStatus: status
+        });
+
+        // émettre l'événement
+        io.emit('appointmentStatusUpdated', {
+        appointmentId: appointment._id,
+        status: appointment.status
+        });
+
+
         // Send update email
         const populatedAppointment = await Appointment.findById(appointment._id)
             .populate('client', 'name email')
@@ -314,8 +339,13 @@ router.delete('/:id', protect,
 });
 
 // get available time slots for a professional on a given date
-router.get('/available-slots/:professionalId/:date', async (req, res) => {
+router.get('/available-slots/:professionalId/:date', 
+    protect,
+    authorize('client', 'professional'),
+    async (req, res) => {
     const { professionalId, date } = req.params;
+    const clientId = req.user.id;
+
     const allSlots = [];
   
     for (let hour = 9; hour <= 17; hour++) {
@@ -324,12 +354,20 @@ router.get('/available-slots/:professionalId/:date', async (req, res) => {
     }
   
     try {
-        const appointments = await Appointment.find({ professional: professionalId, date });
-        const bookedSlots = appointments.map(a => a.time);
+        // Get all appointments on that day for the professional
+        const proAppointments = await Appointment.find({ professional: professionalId, date });
+        
+        // Get all appointments on that day for the current client (with any pro)
+        const clientAppointments = await Appointment.find({ client: clientId, date });
+
+        const bookedSlotsByPro = proAppointments.map(a => a.time);
+        const bookedSlotsByClient = clientAppointments.map(a => a.time);
+
+        // Merge both types of blocks
+        const bookedSlots = Array.from(new Set([...bookedSlotsByPro, ...bookedSlotsByClient]));
+
         // Check if the logged-in client has any appointment with this pro on that date
-        const alreadyBookedThatDay = appointments.some(
-        (app) => app.client.toString() === clientId
-        );
+        const alreadyBookedThatDay = proAppointments.some(app => app.client.toString() === clientId);
         const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
   
         res.json({ 

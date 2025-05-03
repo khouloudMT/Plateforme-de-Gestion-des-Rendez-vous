@@ -1,54 +1,34 @@
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin: 12px 0;
+  margin-top: 16px;
 }
 
 .time-slot {
-  text-align: center;
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
-  cursor: pointer;
-  background-color: #e0f7fa;
-  transition: all 0.2s ease-in-out;
-  user-select: none;
-  border: 1px solid transparent;
-}
-
-.time-slot:hover {
-  background-color: #b2ebf2;
-}
-
-.time-slot.booked {
   background-color: #f1f1f1;
-  color: #999;
-  cursor: not-allowed;
-  border: 1px solid #ccc;
-  text-decoration: line-through;
-}
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 
-.time-slot.selected {
-  background-color: #0288d1;
-  color: white;
-  font-weight: bold;
-}
+  &.selected {
+    background-color: #1976d2;
+    color: white;
+  }
 
-.time-slot.disabled {
-  pointer-events: none;
-}
+  &.booked {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    pointer-events: none;
+    border: 1px solid #ccc;
+  }
 
-.warning {
-  color: #d32f2f;
-  background: #ffe5e5;
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  margin-top: 1rem;
+  &:hover:not(.booked) {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+  }
 }
-.mat-option.disabled-slot {
-  color: gray !important;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-

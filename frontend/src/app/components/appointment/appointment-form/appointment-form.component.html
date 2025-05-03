@@ -29,7 +29,7 @@
         *ngFor="let slot of allTimeSlots"
         [class.booked]="bookedSlots.includes(slot)"
         [class.selected]="appointmentForm.get('time')?.value === slot"
-        [attr.title]="bookedSlots.includes(slot) ? 'Slot already booked' : ''"
+        [attr.title]="bookedSlots.includes(slot) ? 'This time is already booked by you or someone else' : 'Click to book'"
         (click)="selectSlot(slot)"
         [ngClass]="{
           disabled: bookedSlots.includes(slot)
@@ -38,9 +38,9 @@
         {{ slot }}
       </div>
     </div>
-    <mat-card *ngIf="dayBlocked" color="warn" class="warning-card">
+    <mat-card *ngIf="dayBlocked" class="warning-card">
       <mat-card-content>
-        <mat-icon color="warn">warning</mat-icon>
+        <mat-icon color="warn">info</mat-icon>
         You already have an appointment with this professional on this day.
       </mat-card-content>
     </mat-card>

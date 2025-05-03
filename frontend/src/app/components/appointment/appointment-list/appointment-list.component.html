@@ -66,9 +66,9 @@
           <tr *ngFor="let appt of pagedAppointments">
             <td>{{appt.date | date:'mediumDate'}}</td>
             <td>{{appt.time}}</td>
-            <td *ngIf="userRole === 'client'">{{appt.professional.name}}</td>
-            <td *ngIf="userRole === 'client'">{{appt.professional.profession}}</td>
-            <td *ngIf="userRole === 'professional'">{{appt.client.name}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.name | initials}}</td>
+            <td *ngIf="userRole === 'client'">{{appt.professional.profession }}</td>
+            <td *ngIf="userRole === 'professional'">{{appt.client.name | initials}}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.email}}</td>
             <td>
               <span class="status-chip" [ngClass]="appt.status.toLowerCase()">

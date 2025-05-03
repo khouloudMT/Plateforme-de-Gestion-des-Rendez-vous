@@ -15,6 +15,6 @@ async function updateAppointmentStatuses() {
       { status: 'confirmed', date: { $lt: thirtyMinutesAgo } },
       { $set: { status: 'completed' } }
     );
-  }
+  };
   
 module.exports = updateAppointmentStatuses;
