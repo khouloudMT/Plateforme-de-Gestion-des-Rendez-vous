@@ -13,37 +13,53 @@ router.post('/', [
     protect,
     authorize('client'),
     [
-        check('professional', 'Professional is required').not().isEmpty(),
-        check('date', 'Date is required').not().isEmpty(),
-        check('time', 'Time is required').not().isEmpty(),
+      check('professional', 'Professional is required').not().isEmpty(),
+      check('date', 'Date is required').not().isEmpty(),
+      check('time', 'Time is required').not().isEmpty(),
     ]
-], async (req, res) => {
+  ], async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  
     const { professional, date, time, notes } = req.body;
-
-    try {
-        // Check if professional exists
-        const professionalUser = await User.findById(professional);
-        if (!professionalUser || professionalUser.role !== 'professional') {
+  
+    try {   
+        // Validate professional exists
+        const proUser = await User.findById(professional);
+        if (!proUser || proUser.role !== 'professional') {
             return res.status(400).json({ msg: 'Professional not found' });
         }
 
-        // client cant make more than one appointment with the same professional
-        // chack if the appointment exists
-        const existingAppointment = await Appointment.findOne({
+        const existingDayAppointment = await Appointment.findOne({
             client: req.user.id,
-            professional: req.body.professional,
-            date: req.body.date
-          });
-          
-          if (existingAppointment) {
-            return res.status(400).json({ msg: 'You already have an appointment with this professional on this date.' });
-          }
-        // create appointment
+            professional: professional,
+            date: date // only date, ignore time
+        });
+        
+        if (existingDayAppointment) {
+            return res.status(400).json({
+            msg: 'You already have an appointment with this professional on this day.'
+            });
+        }
+    
+        // Prevent double-booking same time slot
+        const conflict = await Appointment.findOne({ professional, date, time });
+        if (conflict) {
+            return res.status(400).json({ msg: 'This time slot is already booked with the selected professional.' });
+        }
+
+        // Prevent client from booking multiple appointments at same time, even with different pros
+        const clientConflict = await Appointment.findOne({
+            client: req.user.id,
+            date,
+            time
+        });
+        if (clientConflict) {
+            return res.status(400).json({
+            msg: 'You already have an appointment at this time.'
+            });
+        }
+    
         const appointment = new Appointment({
             client: req.user.id,
             professional,
@@ -51,37 +67,31 @@ router.post('/', [
             time,
             notes
         });
-
+    
         await appointment.save();
-
-        // Populate professional details for email
-        const savedAppointment = await Appointment.findById(appointment._id)
-            .populate('professional', 'name email')
-            .populate('client', 'name email');
-
-        // Send confirmation email
-        const client = await User.findById(req.user.id);
-        
-        const emailData = {
-            to: client.email,
+    
+        // Email notifications
+        const clientUser = await User.findById(req.user.id);
+    
+        await sendEmail({
+            to: clientUser.email,
             subject: 'Appointment Confirmation',
-            text: `Your appointment with ${savedAppointment.professional.name} on ${date} at ${time} has been booked.`
-        };
-        const emailData2 = {
-            to: professionalUser.email,
-            subject: 'Appointment booked',
-            text: `Your appointment with ${savedAppointment.client.name} on ${date} at ${time} has been booked.`
-        };
-
-        await sendEmail(emailData);
-        await sendEmail(emailData2);
-
-        res.json(appointment);
-    } catch (err) {
+            text: `Your appointment with ${proUser.name} on ${date} at ${time} has been booked.`
+        });
+    
+        await sendEmail({
+            to: proUser.email,
+            subject: 'New Appointment Booked',
+            text: `Appointment with ${clientUser.name} on ${date} at ${time}.`
+        });
+    
+        res.status(201).json(appointment);
+        } catch (err) {
         console.error(err.message);
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ msg: 'Server Error' });
+        }
     }
-});
+);
 
 // @route   GET api/appointments
 // @desc    Get all appointments
@@ -122,7 +132,7 @@ router.get('/my-appointments',
                 .sort({ date: 1 });
         } else if (req.user.role === 'professional') {
             appointments = await Appointment.find({ professional: req.user.id })
-                .populate('client', 'name email')
+                .populate('client', 'name email phone')
                 .sort({ date: 1 });
         } else {
             return res.status(401).json({ msg: 'Not authorized' });
@@ -135,8 +145,6 @@ router.get('/my-appointments',
         res.status(500).send('Server Error');
     }
 });
-
-
 
 // @route   GET api/appointments/:id
 // @desc    Get appointment by ID
@@ -237,6 +245,19 @@ router.put('/:id',
         }
 
         await appointment.save();
+
+         // Notify the client via socket
+        req.io.to(appointment.client.toString()).emit('appointmentStatusChanged', {
+            appointmentId: appointment._id,
+            newStatus: status
+        });
+
+        // émettre l'événement
+        io.emit('appointmentStatusUpdated', {
+        appointmentId: appointment._id,
+        status: appointment.status
+        });
+
 
         // Send update email
         const populatedAppointment = await Appointment.findById(appointment._id)
@@ -361,6 +382,89 @@ router.put('/:id/admin-cancel',
     }
 });
 
+// @route   PUT api/appointments/:id/admin-cancel
+// @desc    Admin cancels appointment
+// @access  Private/Admin
+router.put('/:id/admin-cancel', 
+    protect,
+    authorize('admin'),
+    async (req, res) => {
+    try {
+        const appointment = await Appointment.findById(req.params.id)
+            .populate('client', 'name email')
+            .populate('professional', 'name email');
 
+        if (!appointment) {
+            return res.status(404).json({ msg: 'Appointment not found' });
+        }
 
+        appointment.status = 'cancelled';
+        await appointment.save();
+
+        // Send notifications
+        const emailData = {
+            to: appointment.client.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.professional.name} has been cancelled by admin.`
+        };
+        const emailData2 = {
+            to: appointment.professional.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.client.name} has been cancelled by admin.`
+        };
+
+        await sendEmail(emailData);
+        await sendEmail(emailData2);
+
+        res.json(appointment);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// get available time slots for a professional on a given date
+router.get('/available-slots/:professionalId/:date', 
+    protect,
+    authorize('client', 'professional'),
+    async (req, res) => {
+    const { professionalId, date } = req.params;
+    const clientId = req.user.id;
+
+    const allSlots = [];
+  
+    for (let hour = 9; hour <= 17; hour++) {
+        allSlots.push(`${hour}:00`);
+        allSlots.push(`${hour}:30`);
+    }
+  
+    try {
+        // Get all appointments on that day for the professional
+        const proAppointments = await Appointment.find({ professional: professionalId, date });
+        
+        // Get all appointments on that day for the current client (with any pro)
+        const clientAppointments = await Appointment.find({ client: clientId, date });
+
+        const bookedSlotsByPro = proAppointments.map(a => a.time);
+        const bookedSlotsByClient = clientAppointments.map(a => a.time);
+
+        // Merge both types of blocks
+        const bookedSlots = Array.from(new Set([...bookedSlotsByPro, ...bookedSlotsByClient]));
+
+        // Check if the logged-in client has any appointment with this pro on that date
+        const alreadyBookedThatDay = proAppointments.some(app => app.client.toString() === clientId);
+        const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
+  
+        res.json({ 
+            allSlots, 
+            bookedSlots, 
+            availableSlots,
+            alreadyBookedThatDay
+        });
+    }   catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server error fetching slots' });
+    }
+  });
 module.exports = router;
+

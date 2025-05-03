@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';  
 @Injectable({
   providedIn: 'root'
@@ -67,6 +67,10 @@ export class AuthService {
   getUserRole(): string | null {
     const user = this.currentUserValue;
     return user ? user.role : null;
+  }
+
+  getCurrentUser(): Observable<any> {
+    return this.http.get(`http://localhost:5000/api/user`);
   }
 
 }

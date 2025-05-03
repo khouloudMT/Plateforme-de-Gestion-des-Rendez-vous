@@ -35,7 +35,8 @@ export const routes: Routes = [
             canActivate: [roleGuard],
             data: { role: 'professional' },
             children: [
-              { path: '', component: AppointmentListComponent },
+              { path: '', redirectTo: 'appointments', pathMatch: 'full' },
+              { path: 'appointments', component: AppointmentListComponent },
               { path: 'calendar', component: CalendarViewComponent },
             ]
           },
@@ -46,7 +47,8 @@ export const routes: Routes = [
             canActivate: [roleGuard],
             data: { role: 'client' },
             children: [
-              { path: '', component: AppointmentListComponent },
+              { path: '', redirectTo: 'appointments', pathMatch: 'full' },
+              { path:'appointments', component: AppointmentListComponent },
               { path: 'calendar', component: CalendarViewComponent },
               { path: 'professionals', component: ProfessionalListComponent },
             ]

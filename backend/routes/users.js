@@ -31,7 +31,7 @@ router.get('/',
 // @access  Private
 router.get('/professionals',
     protect,
-    authorize('admin','client'), // Ensure only admin can access this route
+     // Ensure only admin can access this route
      async (req, res) => {
     try {
         const professionals = await User.find({ role: 'professional' }).select('-password');

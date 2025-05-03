@@ -79,7 +79,7 @@ export class RescheduleAppointmentComponent implements OnInit {
       next: (res: any) => {
         // Convert the date to the format expected by the datepicker
         const dateObj = new Date(res.date);
-        const formattedDate = dateObj.toISOString().split('T')[0];
+        const formattedDate = dateObj.getFullYear() + '-' + this.pad(dateObj.getMonth() + 1) + '-' + this.pad(dateObj.getDate());
         this.appointment = {
           _id: res._id || '', // Ensure _id is included
           date: formattedDate , // yyyy-mm-dd

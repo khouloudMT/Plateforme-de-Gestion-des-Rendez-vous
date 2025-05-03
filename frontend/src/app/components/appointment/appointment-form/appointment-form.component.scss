@@ -1,0 +1,34 @@
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.time-slot {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #f1f1f1;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  &.selected {
+    background-color: #1976d2;
+    color: white;
+  }
+
+  &.booked {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    pointer-events: none;
+    border: 1px solid #ccc;
+  }
+
+  &:hover:not(.booked) {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+  }
+}
