@@ -57,6 +57,7 @@
             <th *ngIf="userRole === 'client'">Professional</th>
             <th *ngIf="userRole === 'client'">Profession</th>
             <th *ngIf="userRole === 'professional'">Client</th>
+            <th *ngIf="userRole === 'admin'">Profession</th>
             <th *ngIf="userRole === 'professional'">Email</th>
             <th>Status</th>
             <th>Actions</th>
@@ -70,12 +71,27 @@
             <td *ngIf="userRole === 'client'">{{appt.professional.profession }}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.name | initials}}</td>
             <td *ngIf="userRole === 'professional'">{{appt.client.email}}</td>
+            <!-- Profession Column (Admin only) -->
+            <td *ngIf="userRole === 'admin'">
+              {{appt.professional?.profession || 'N/A'}}
+            </td>
             <td>
               <span class="status-chip" [ngClass]="appt.status.toLowerCase()">
                 {{appt.status}}
               </span>
             </td>
             <td>
+              <!-- Admin Actions -->
+              <div *ngIf="userRole === 'admin'" class="action-buttons">
+                               <!-- Admin Actions -->
+                            
+                                <button mat-icon-button color="warn" 
+                                        (click)="adminCancel(appt)"
+                                        matTooltip="Cancel as Admin">
+                                  <mat-icon>cancel</mat-icon>
+                                </button>
+                              
+              </div>
             <!-- Client Actions -->
               <div *ngIf="userRole === 'client'" class="action-buttons">
                 <button mat-icon-button color="primary" 

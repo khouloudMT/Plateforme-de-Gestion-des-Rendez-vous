@@ -115,5 +115,15 @@ export class AppointmentService {
     }
   }
 
+  adminCancelAppointment(appointmentId: string): Observable<any> {
+    return this.http.put(`http://localhost:5000/api/appointments/${appointmentId}`, {
+      status: 'cancelled'
+    });
+  }
+  getAdminAppointments(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:5000/api/appointments');
+  }
+
+
   
 }

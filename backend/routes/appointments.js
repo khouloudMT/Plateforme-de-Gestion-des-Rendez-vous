@@ -324,7 +324,10 @@ router.delete('/:id', protect,
             text: `Your appointment with ${populatedAppointment.client.name} on ${appointment.date} has been cancelled.`
         };
 
-        await await Appointment.findByIdAndDelete(req.params.id);
+        appointment.status = 'cancelled';
+        await appointment.save();
+
+        // await await Appointment.findByIdAndDelete(req.params.id);
         await sendEmail(emailData);
         await sendEmail(emailData2);
 
@@ -335,6 +338,88 @@ router.delete('/:id', protect,
             return res.status(404).json({ msg: 'Appointment not found' });
         }
         res.status(500).json({ message: "Server Error" });
+    }
+});
+
+// @route   PUT api/appointments/:id/admin-cancel
+// @desc    Admin cancels appointment
+// @access  Private/Admin
+router.put('/:id/admin-cancel', 
+    protect,
+    authorize('admin'),
+    async (req, res) => {
+    try {
+        const appointment = await Appointment.findById(req.params.id)
+            .populate('client', 'name email')
+            .populate('professional', 'name email');
+
+        if (!appointment) {
+            return res.status(404).json({ msg: 'Appointment not found' });
+        }
+
+        appointment.status = 'cancelled';
+        await appointment.save();
+
+        // Send notifications
+        const emailData = {
+            to: appointment.client.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.professional.name} has been cancelled by admin.`
+        };
+        const emailData2 = {
+            to: appointment.professional.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.client.name} has been cancelled by admin.`
+        };
+
+        await sendEmail(emailData);
+        await sendEmail(emailData2);
+
+        res.json(appointment);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   PUT api/appointments/:id/admin-cancel
+// @desc    Admin cancels appointment
+// @access  Private/Admin
+router.put('/:id/admin-cancel', 
+    protect,
+    authorize('admin'),
+    async (req, res) => {
+    try {
+        const appointment = await Appointment.findById(req.params.id)
+            .populate('client', 'name email')
+            .populate('professional', 'name email');
+
+        if (!appointment) {
+            return res.status(404).json({ msg: 'Appointment not found' });
+        }
+
+        appointment.status = 'cancelled';
+        await appointment.save();
+
+        // Send notifications
+        const emailData = {
+            to: appointment.client.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.professional.name} has been cancelled by admin.`
+        };
+        const emailData2 = {
+            to: appointment.professional.email,
+            subject: 'Appointment Cancelled by Admin',
+            text: `Your appointment with ${appointment.client.name} has been cancelled by admin.`
+        };
+
+        await sendEmail(emailData);
+        await sendEmail(emailData2);
+
+        res.json(appointment);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
     }
 });
 
@@ -382,3 +467,4 @@ router.get('/available-slots/:professionalId/:date',
     }
   });
 module.exports = router;
+

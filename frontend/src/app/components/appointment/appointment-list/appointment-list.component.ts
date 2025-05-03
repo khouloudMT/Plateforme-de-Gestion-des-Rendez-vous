@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component'; // ajuste le chemin si besoin
 import { RescheduleAppointmentComponent } from '../reschedule-appointment/reschedule-appointment.component';
 import { AppointmentFormComponent } from '../appointment-form/appointment-form.component';
@@ -72,8 +73,9 @@ export class AppointmentListComponent implements OnInit {
     private fb: FormBuilder,
     
     private dialog: MatDialog,
-    private userService: UserService,
     private authService: AuthService,
+    private userService: UserService,
+    private snackBar: MatSnackBar
   ) {
     this.filterForm = this.fb.group({
       fromDate: [''],
@@ -107,7 +109,9 @@ export class AppointmentListComponent implements OnInit {
       this.displayedColumns = ['date', 'time', 'professional', 'profession', 'status', 'edit', 'cancel'];
     } else if (this.userRole === 'professional') {
       this.displayedColumns = ['date', 'time', 'client', 'phone', 'email', 'status', 'edit', 'cancel'];
-    }
+    }   else if (this.userRole === 'admin') {
+      this.displayedColumns = ['date', 'time', 'client', 'professional', 'profession', 'status', 'actions'];
+    } 
   }
 
   loadAppointments() {
@@ -123,7 +127,20 @@ export class AppointmentListComponent implements OnInit {
         console.error("Erreur chargement appointments", err);
       }
     });
+    if (this.userRole === 'admin') {
+      this.appointmentService.getAdminAppointments().subscribe(
+        {next: (res: any[]) => {
+        this.appointments = res;
+        this.allAppointments = res;
+        this.updatePagedAppointments();
+      },
+      error: err => console.error("Error loading appointments", err)
+    });
+    }
+    
   }
+
+  
 
   loadProfessionals() {
     this.userService.getProfessionals().subscribe(professionals => {
@@ -131,6 +148,7 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
+ 
   //Pagination
   handlePageEvent(e: PageEvent) {
     this.currentPage = e.pageIndex + 1;
@@ -221,7 +239,26 @@ export class AppointmentListComponent implements OnInit {
   }
 
    
-     
+  adminCancel(appointment: any): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '350px',
+      data: { message: 'Are you sure you want to cancel this appointment as admin?' }
+    });
+ 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.appointmentService.adminCancelAppointment(appointment._id).subscribe({
+          next: () => {
+            this.snackBar.open('Appointment cancelled successfully', 'Close', { duration: 3000 });
+            this.loadAppointments();
+          },
+          error: (err) => {
+            this.snackBar.open('Failed to cancel appointment', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
+  }
    
    
 
@@ -250,4 +287,14 @@ export class AppointmentListComponent implements OnInit {
     this.updatePagedAppointments();
   }
 
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'confirmed': return 'primary';
+      case 'pending': return 'accent';
+      case 'cancelled': return 'warn';
+      case 'completed': return 'green';
+      default: return '';
+    }
+  }
 }
