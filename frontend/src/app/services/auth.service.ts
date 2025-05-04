@@ -69,8 +69,5 @@ export class AuthService {
     return user ? user.role : null;
   }
 
-  getCurrentUser(): Observable<any> {
-    return this.http.get(`http://localhost:5000/api/user`);
-  }
 
 }

@@ -93,7 +93,7 @@ export class CalendarViewComponent {
   }
 
   loadProfessionalAppointments() {
-    this.appointmentService.getProfessionalAppointments().subscribe({
+    this.appointmentService.getClientAppointments().subscribe({
       next: (appointments) => {
         const events = appointments.map(appointment => ({
           id: appointment._id,

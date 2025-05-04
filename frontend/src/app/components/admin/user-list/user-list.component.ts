@@ -37,9 +37,14 @@ export class UserListComponent implements OnInit {
   displayedColumns: string[] = ['name', 'email', 'role', 'profession', 'createdAt', 'actions'];
   isLoading = true;
   totalUsers = 0;
-  pageSize = 10;
+  
   pageIndex = 0;
   pageSizeOptions = [5, 10, 25, 100];
+
+  // Pagination variables
+  pageSize = 7; 
+  currentPage = 1;
+  pagedUsers: any[] = [];
 
   constructor(
     private userService: UserService,
@@ -58,6 +63,8 @@ export class UserListComponent implements OnInit {
         this.users = users;
         this.totalUsers = users.length;
         this.isLoading = false;
+        this.currentPage = 1;
+        this.updatePagedUsers();
       },
       error: (err) => {
         console.error('Failed to load users:', err);
@@ -69,11 +76,7 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  handlePageEvent(event: PageEvent): void {
-    this.pageSize = event.pageSize;
-    this.pageIndex = event.pageIndex;
-    // Implement server-side pagination if needed
-  }
+
 
   deleteUser(userId: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -128,17 +131,31 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  getRoleColor(role: string): string {
-    switch (role.toLowerCase()) { // Handle case variations
-      case 'admin': 
-        return '#3f51b5'; // Indigo
-      case 'professional': 
-        return '#4caf50'; // Green
-      case 'client': 
-        return '#ff9800'; // Orange
-      default: 
-        return '#9e9e9e'; // Grey for unknown roles
-    }
+  // pagination logic
+  //Pagination
+  handlePageEvent(e: PageEvent) {
+    this.currentPage = e.pageIndex + 1;
+    this.pageSize = e.pageSize;
+    this.updatePagedUsers();
   }
+  
+  updatePagedUsers() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.pagedUsers = this.users.slice(startIndex, endIndex);
+  }
+
+  getRoleColor(role: string): string {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return '#5C6BC0'; // Soft Indigo
+      case 'professional':
+        return '#66BB6A'; // Medium Green
+      case 'client':
+        return '#FFA726'; // Warm Orange
+      default:
+        return '#BDBDBD'; // Light Grey for unknown roles
+    }
+  }  
 
 }

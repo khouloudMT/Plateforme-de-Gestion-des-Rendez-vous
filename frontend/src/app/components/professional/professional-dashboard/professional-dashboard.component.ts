@@ -45,7 +45,7 @@ export class ProfessionalDashboardComponent {
  
 
   loadAppointments() {
-    this.appointmentService.getProfessionalAppointments().subscribe(appointments => {
+    this.appointmentService.getClientAppointments().subscribe(appointments => {
       this.appointments = appointments;
     });
   }

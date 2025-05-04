@@ -14,13 +14,15 @@ router.get('/appointments', protect, authorize('admin'), async (req, res) => {
     const pending = await Appointment.countDocuments({ status: 'pending' });
     const confirmed = await Appointment.countDocuments({ status: 'confirmed' });
     const cancelled = await Appointment.countDocuments({ status: 'cancelled' });
+    const expired = await Appointment.countDocuments({ status: 'expired' });
 
     res.json({
       total,
       completed,
       pending,
       confirmed,
-      cancelled
+      cancelled,
+      expired
     });
   } catch (err) {
     console.error(err.message);

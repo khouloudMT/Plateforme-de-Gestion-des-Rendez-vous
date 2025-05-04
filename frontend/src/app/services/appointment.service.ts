@@ -22,17 +22,14 @@ export class AppointmentService {
     constructor(private http: HttpClient,
   ) { }
 
-  getMyAppointments(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
-  }  
+  // getMyAppointments(): Observable<any[]> {
+  //   return this.http.get<any[]>('http://localhost:5000/api/appointments/my-appointments');
+  // }  
 
   getClientAppointments() {
     return this.http.get<any[]>(`http://localhost:5000/api/appointments/my-appointments`);
   }
 
-  getProfessionalAppointments() {
-    return this.http.get<any[]>(`http://localhost:5000/api/appointments/my-appointments`);
-  }
 
   createAppointment(appointmentData: any) {
     return this.http.post(`http://localhost:5000/api/appointments`, appointmentData);
@@ -54,8 +51,6 @@ export class AppointmentService {
     return this.http.get(`http://localhost:5000/api/appointments/available-slots/${professionalId}/${date}`);
   }
   
-
-
 
 
 
@@ -116,8 +111,7 @@ export class AppointmentService {
   }
 
   adminCancelAppointment(appointmentId: string): Observable<any> {
-    return this.http.put(`http://localhost:5000/api/appointments/${appointmentId}`, {
-      status: 'cancelled'
+    return this.http.delete(`http://localhost:5000/api/appointments/${appointmentId}/admin-cancel`, {
     });
   }
   getAdminAppointments(): Observable<any[]> {

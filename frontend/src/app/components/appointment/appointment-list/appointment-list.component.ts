@@ -17,7 +17,6 @@ import { AuthService } from '../../../services/auth.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
 import { InitialsPipe } from "../../../pipes/initials.pipe";
 
 
@@ -65,7 +64,6 @@ export class AppointmentListComponent implements OnInit {
   currentPage = 1;
  
   
-  private notificationSubscription!: Subscription;
 
 
   constructor(
@@ -90,9 +88,9 @@ export class AppointmentListComponent implements OnInit {
       return this.appointmentService.updateAppointment(appointmentId, updateData);
     }
 
-  deleteAppointment(appointmentId: string) {
-      return this.appointmentService.deleteAppointment(appointmentId);
-    }
+  // deleteAppointment(appointmentId: string) {
+  //     return this.appointmentService.deleteAppointment(appointmentId);
+  //   }
 
  
 

@@ -116,7 +116,8 @@ export class StatsComponent implements OnInit  {
             '#ff9800', // pending
             '#4caf50', // confirmed
             '#f44336', // cancelled
-            '#2196f3'  // completed
+            '#2196f3',  // completed
+            '#000000' // expired
           ]
         }
       ],

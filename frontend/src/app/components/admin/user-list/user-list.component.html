@@ -93,13 +93,22 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <mat-paginator [length]="totalUsers"
-                     [pageSize]="pageSize"
-                     [pageIndex]="pageIndex"
-                     [pageSizeOptions]="pageSizeOptions"
-                     (page)="handlePageEvent($event)"
-                     aria-label="Select page">
-      </mat-paginator>
+        <!-- Pagination -->
+        <div class="pagination-container">
+          <div class="pagination-info">
+      
+          
+          
+          <mat-paginator [length]="users.length"
+                         [pageSize]="pageSize"
+                         [pageIndex]="currentPage - 1"
+                         [pageSizeOptions]="[5, 10, 25]"
+                         (page)="handlePageEvent($event)"
+                         hidePageSize="true"
+                         aria-label="Select page">
+          </mat-paginator>
+        </div>
+        </div>
     </div>
   </div>
 </div>

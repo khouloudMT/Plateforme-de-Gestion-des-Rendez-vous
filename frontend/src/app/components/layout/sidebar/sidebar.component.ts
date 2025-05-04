@@ -30,29 +30,29 @@ interface NavItem {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent  {
   @Input() navItems: NavItem[] = [];
   @Input() isCollapsed = false;
   @Output() toggle = new EventEmitter<boolean>();
 
-  currentUser: any = null;
-  user: any ;
+  // currentUser: any = null;
+  // user: any ;
 
   constructor(
     private authService: AuthService,
 
   ) {}
 
-  ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe({
-      next: (data) => {
-        this.user = data;
-      },
-      error: (err) => {
-        console.error('Failed to fetch user', err);
-      }
-    });
-  }
+  // ngOnInit(): void {
+  //   this.authService.getCurrentUser().subscribe({
+  //     next: (data) => {
+  //       this.user = data;
+  //     },
+  //     error: (err) => {
+  //       console.error('Failed to fetch user', err);
+  //     }
+  //   });
+  // }
 
 
   toggleSidebar() {

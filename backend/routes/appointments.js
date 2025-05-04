@@ -182,7 +182,7 @@ router.get('/:id',
 // @access  Private
 router.put('/:id', 
     protect, 
-    authorize('client', 'professional'),
+    authorize('client', 'professional','admin'),
     [
         check('date', 'Date is required').optional().not().isEmpty(),
         check('time', 'Time is required').optional().not().isEmpty(),
@@ -245,19 +245,6 @@ router.put('/:id',
         }
 
         await appointment.save();
-
-         // Notify the client via socket
-        req.io.to(appointment.client.toString()).emit('appointmentStatusChanged', {
-            appointmentId: appointment._id,
-            newStatus: status
-        });
-
-        // émettre l'événement
-        io.emit('appointmentStatusUpdated', {
-        appointmentId: appointment._id,
-        status: appointment.status
-        });
-
 
         // Send update email
         const populatedAppointment = await Appointment.findById(appointment._id)
@@ -341,10 +328,12 @@ router.delete('/:id', protect,
     }
 });
 
+
+
 // @route   PUT api/appointments/:id/admin-cancel
 // @desc    Admin cancels appointment
 // @access  Private/Admin
-router.put('/:id/admin-cancel', 
+router.delete('/:id/admin-cancel', 
     protect,
     authorize('admin'),
     async (req, res) => {
@@ -357,8 +346,7 @@ router.put('/:id/admin-cancel',
             return res.status(404).json({ msg: 'Appointment not found' });
         }
 
-        appointment.status = 'cancelled';
-        await appointment.save();
+        await appointment.deleteOne();
 
         // Send notifications
         const emailData = {
@@ -382,46 +370,6 @@ router.put('/:id/admin-cancel',
     }
 });
 
-// @route   PUT api/appointments/:id/admin-cancel
-// @desc    Admin cancels appointment
-// @access  Private/Admin
-router.put('/:id/admin-cancel', 
-    protect,
-    authorize('admin'),
-    async (req, res) => {
-    try {
-        const appointment = await Appointment.findById(req.params.id)
-            .populate('client', 'name email')
-            .populate('professional', 'name email');
-
-        if (!appointment) {
-            return res.status(404).json({ msg: 'Appointment not found' });
-        }
-
-        appointment.status = 'cancelled';
-        await appointment.save();
-
-        // Send notifications
-        const emailData = {
-            to: appointment.client.email,
-            subject: 'Appointment Cancelled by Admin',
-            text: `Your appointment with ${appointment.professional.name} has been cancelled by admin.`
-        };
-        const emailData2 = {
-            to: appointment.professional.email,
-            subject: 'Appointment Cancelled by Admin',
-            text: `Your appointment with ${appointment.client.name} has been cancelled by admin.`
-        };
-
-        await sendEmail(emailData);
-        await sendEmail(emailData2);
-
-        res.json(appointment);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
-    }
-});
 
 // get available time slots for a professional on a given date
 router.get('/available-slots/:professionalId/:date', 
